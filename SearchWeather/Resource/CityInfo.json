@@ -1,0 +1,627 @@
+{
+  "cities": [
+    {
+      "city": "Rio de Janeiro",
+      "ko_city_name": "리우데자네이루",
+      "country": "Brazil",
+      "ko_country_name": "브라질",
+      "id": 3451190
+    },
+    {
+      "city": "Sofia",
+      "ko_city_name": "소피아",
+      "country": "Bulgaria",
+      "ko_country_name": "불가리아",
+      "id": 727011
+    },
+    {
+      "city": "Ouagadougou",
+      "ko_city_name": "와가두구",
+      "country": "Burkina Faso",
+      "ko_country_name": "부르키나파소",
+      "id": 2357048
+    },
+    {
+      "city": "Phnom Penh",
+      "ko_city_name": "프놈펜",
+      "country": "Cambodia",
+      "ko_country_name": "캄보디아",
+      "id": 1821306
+    },
+    {
+      "city": "Yaounde",
+      "ko_city_name": "야운데",
+      "country": "Cameroon",
+      "ko_country_name": "카메룬",
+      "id": 2220957
+    },
+    {
+      "city": "Ottawa",
+      "ko_city_name": "오타와",
+      "country": "Canada",
+      "ko_country_name": "캐나다",
+      "id": 6094817
+    },
+    {
+      "city": "Toronto",
+      "ko_city_name": "토론토",
+      "country": "Canada",
+      "ko_country_name": "캐나다",
+      "id": 6167865
+    },
+    {
+      "city": "Vancouver",
+      "ko_city_name": "밴쿠버",
+      "country": "Canada",
+      "ko_country_name": "캐나다",
+      "id": 6173331
+    },
+    {
+      "city": "Santiago",
+      "ko_city_name": "산티아고",
+      "country": "Chile",
+      "ko_country_name": "칠레",
+      "id": 3871336
+    },
+    {
+      "city": "Beijing",
+      "ko_city_name": "베이징",
+      "country": "China",
+      "ko_country_name": "중국",
+      "id": 1816670
+    },
+    {
+      "city": "Shanghai",
+      "ko_city_name": "상하이",
+      "country": "China",
+      "ko_country_name": "중국",
+      "id": 1796236
+    },
+    {
+      "city": "Guangzhou",
+      "ko_city_name": "광저우",
+      "country": "China",
+      "ko_country_name": "중국",
+      "id": 1809858
+    },
+    {
+      "city": "Shenzhen",
+      "ko_city_name": "선전",
+      "country": "China",
+      "ko_country_name": "중국",
+      "id": 1795565
+    },
+    {
+      "city": "Bogota",
+      "ko_city_name": "보고타",
+      "country": "Colombia",
+      "ko_country_name": "콜롬비아",
+      "id": 3688689
+    },
+    {
+      "city": "Kinshasa",
+      "ko_city_name": "킨샤사",
+      "country": "Democratic Republic of the Congo",
+      "ko_country_name": "콩고민주공화국",
+      "id": 2314302
+    },
+    {
+      "city": "San Jose",
+      "ko_city_name": "산호세",
+      "country": "Costa Rica",
+      "ko_country_name": "코스타리카",
+      "id": 3621849
+    },
+    {
+      "city": "Zagreb",
+      "ko_city_name": "자그레브",
+      "country": "Croatia",
+      "ko_country_name": "크로아티아",
+      "id": 3186886
+    },
+    {
+      "city": "Havana",
+      "ko_city_name": "아바나",
+      "country": "Cuba",
+      "ko_country_name": "쿠바",
+      "id": 3553478
+    },
+    {
+      "city": "Prague",
+      "ko_city_name": "프라하",
+      "country": "Czech Republic",
+      "ko_country_name": "체코",
+      "id": 3067696
+    },
+    {
+      "city": "Copenhagen",
+      "ko_city_name": "코펜하겐",
+      "country": "Denmark",
+      "ko_country_name": "덴마크",
+      "id": 2618425
+    },
+    {
+      "city": "Cairo",
+      "ko_city_name": "카이로",
+      "country": "Egypt",
+      "ko_country_name": "이집트",
+      "id": 360630
+    },
+    {
+      "city": "Alexandria",
+      "ko_city_name": "알렉산드리아",
+      "country": "Egypt",
+      "ko_country_name": "이집트",
+      "id": 361058
+    },
+    {
+      "city": "Addis Ababa",
+      "ko_city_name": "아디스아바바",
+      "country": "Ethiopia",
+      "ko_country_name": "에티오피아",
+      "id": 344979
+    },
+    {
+      "city": "Helsinki",
+      "ko_city_name": "헬싱키",
+      "country": "Finland",
+      "ko_country_name": "핀란드",
+      "id": 658225
+    },
+    {
+      "city": "Paris",
+      "ko_city_name": "파리",
+      "country": "France",
+      "ko_country_name": "프랑스",
+      "id": 2988507
+    },
+    {
+      "city": "Marseille",
+      "ko_city_name": "마르세유",
+      "country": "France",
+      "ko_country_name": "프랑스",
+      "id": 2995469
+    },
+    {
+      "city": "Lyon",
+      "ko_city_name": "리옹",
+      "country": "France",
+      "ko_country_name": "프랑스",
+      "id": 2996944
+    },
+    {
+      "city": "Berlin",
+      "ko_city_name": "베를린",
+      "country": "Germany",
+      "ko_country_name": "독일",
+      "id": 2950159
+    },
+    {
+      "city": "Hamburg",
+      "ko_city_name": "함부르크",
+      "country": "Germany",
+      "ko_country_name": "독일",
+      "id": 2911298
+    },
+    {
+      "city": "Munich",
+      "ko_city_name": "뮌헨",
+      "country": "Germany",
+      "ko_country_name": "독일",
+      "id": 2867714
+    },
+    {
+      "city": "Frankfurt",
+      "ko_city_name": "프랑크푸르트",
+      "country": "Germany",
+      "ko_country_name": "독일",
+      "id": 2925533
+    },
+    {
+      "city": "Accra",
+      "ko_city_name": "아크라",
+      "country": "Ghana",
+      "ko_country_name": "가나",
+      "id": 2306104
+    },
+    {
+      "city": "Athens",
+      "ko_city_name": "아테네",
+      "country": "Greece",
+      "ko_country_name": "그리스",
+      "id": 264371
+    },
+    {
+      "city": "Guatemala City",
+      "ko_city_name": "과테말라시티",
+      "country": "Guatemala",
+      "ko_country_name": "과테말라",
+      "id": 3598132
+    },
+    {
+      "city": "Port-au-Prince",
+      "ko_city_name": "포르토프랭스",
+      "country": "Haiti",
+      "ko_country_name": "아이티",
+      "id": 3718426
+    },
+    {
+      "city": "Tegucigalpa",
+      "ko_city_name": "테구시갈파",
+      "country": "Honduras",
+      "ko_country_name": "온두라스",
+      "id": 3600949
+    },
+    {
+      "city": "Hong Kong",
+      "ko_city_name": "홍콩",
+      "country": "Hong Kong",
+      "ko_country_name": "홍콩",
+      "id": 1819729
+    },
+    {
+      "city": "Budapest",
+      "ko_city_name": "부다페스트",
+      "country": "Hungary",
+      "ko_country_name": "헝가리",
+      "id": 3054643
+    },
+    {
+      "city": "Reykjavik",
+      "ko_city_name": "레이캬비크",
+      "country": "Iceland",
+      "ko_country_name": "아이슬란드",
+      "id": 3413829
+    },
+    {
+      "city": "New Delhi",
+      "ko_city_name": "뉴델리",
+      "country": "India",
+      "ko_country_name": "인도",
+      "id": 1261481
+    },
+    {
+      "city": "Mumbai",
+      "ko_city_name": "뭄바이",
+      "country": "India",
+      "ko_country_name": "인도",
+      "id": 1275339
+    },
+    {
+      "city": "Bangalore",
+      "ko_city_name": "방갈로르",
+      "country": "India",
+      "ko_country_name": "인도",
+      "id": 1277333
+    },
+    {
+      "city": "Kolkata",
+      "ko_city_name": "콜카타",
+      "country": "India",
+      "ko_country_name": "인도",
+      "id": 1275004
+    },
+    {
+      "city": "Chennai",
+      "ko_city_name": "첸나이",
+      "country": "India",
+      "ko_country_name": "인도",
+      "id": 1264527
+    },
+    {
+      "city": "Jakarta",
+      "ko_city_name": "자카르타",
+      "country": "Indonesia",
+      "ko_country_name": "인도네시아",
+      "id": 1642911
+    },
+    {
+      "city": "Surabaya",
+      "ko_city_name": "수라바야",
+      "country": "Indonesia",
+      "ko_country_name": "인도네시아",
+      "id": 1625822
+    },
+    {
+      "city": "Tehran",
+      "ko_city_name": "테헤란",
+      "country": "Iran",
+      "ko_country_name": "이란",
+      "id": 112931
+    },
+    {
+      "city": "Baghdad",
+      "ko_city_name": "바그다드",
+      "country": "Iraq",
+      "ko_country_name": "이라크",
+      "id": 98182
+    },
+    {
+      "city": "Dublin",
+      "ko_city_name": "더블린",
+      "country": "Ireland",
+      "ko_country_name": "아일랜드",
+      "id": 2964574
+    },
+    {
+      "city": "Tel Aviv",
+      "ko_city_name": "텔아비브",
+      "country": "Israel",
+      "ko_country_name": "이스라엘",
+      "id": 293397
+    },
+    {
+      "city": "Jerusalem",
+      "ko_city_name": "예루살렘",
+      "country": "Israel",
+      "ko_country_name": "이스라엘",
+      "id": 281184
+    },
+    {
+      "city": "Rome",
+      "ko_city_name": "로마",
+      "country": "Italy",
+      "ko_country_name": "이탈리아",
+      "id": 3169070
+    },
+    {
+      "city": "Milan",
+      "ko_city_name": "밀라노",
+      "country": "Italy",
+      "ko_country_name": "이탈리아",
+      "id": 3173435
+    },
+    {
+      "city": "Tokyo",
+      "ko_city_name": "도쿄",
+      "country": "Japan",
+      "ko_country_name": "일본",
+      "id": 1850147
+    },
+    {
+      "city": "Osaka",
+      "ko_city_name": "오사카",
+      "country": "Japan",
+      "ko_country_name": "일본",
+      "id": 1853909
+    },
+    {
+      "city": "Yokohama",
+      "ko_city_name": "요코하마",
+      "country": "Japan",
+      "ko_country_name": "일본",
+      "id": 1848354
+    },
+    {
+      "city": "Amman",
+      "ko_city_name": "암만",
+      "country": "Jordan",
+      "ko_country_name": "요르단",
+      "id": 250441
+    },
+    {
+      "city": "Astana",
+      "ko_city_name": "아스타나",
+      "country": "Kazakhstan",
+      "ko_country_name": "카자흐스탄",
+      "id": 1526384
+    },
+    {
+      "city": "Nairobi",
+      "ko_city_name": "나이로비",
+      "country": "Kenya",
+      "ko_country_name": "케냐",
+      "id": 184745
+    },
+    {
+      "city": "Kuwait City",
+      "ko_city_name": "쿠웨이트시티",
+      "country": "Kuwait",
+      "ko_country_name": "쿠웨이트",
+      "id": 285787
+    },
+    {
+      "city": "Seoul",
+      "ko_city_name": "서울",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1835848
+    },
+    {
+      "city": "Busan",
+      "ko_city_name": "부산",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1838524
+    },
+    {
+      "city": "Incheon",
+      "ko_city_name": "인천",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1843564
+    },
+    {
+      "city": "Daegu",
+      "ko_city_name": "대구",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1835327
+    },
+    {
+      "city": "Daejeon",
+      "ko_city_name": "대전",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1835224
+    },
+    {
+      "city": "Gwangju",
+      "ko_city_name": "광주",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1841811
+    },
+    {
+      "city": "Suwon",
+      "ko_city_name": "수원",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1835553
+    },
+    {
+      "city": "Ulsan",
+      "ko_city_name": "울산",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1833747
+    },
+    {
+      "city": "Seongnam",
+      "ko_city_name": "성남",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1835329
+    },
+    {
+      "city": "Goyang",
+      "ko_city_name": "고양",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1842616
+    },
+    {
+      "city": "Bucheon",
+      "ko_city_name": "부천",
+      "country": "South Korea",
+      "ko_country_name": "대한민국",
+      "id": 1838716
+    },
+    {
+      "city": "Vientiane",
+      "ko_city_name": "비엔티안",
+      "country": "Laos",
+      "ko_country_name": "라오스",
+      "id": 1651944
+    },
+    {
+      "city": "Riga",
+      "ko_city_name": "리가",
+      "country": "Latvia",
+      "ko_country_name": "라트비아",
+      "id": 456172
+    },
+    {
+      "city": "Beirut",
+      "ko_city_name": "베이루트",
+      "country": "Lebanon",
+      "ko_country_name": "레바논",
+      "id": 276781
+    },
+    {
+      "city": "Vilnius",
+      "ko_city_name": "빌뉴스",
+      "country": "Lithuania",
+      "ko_country_name": "리투아니아",
+      "id": 593116
+    },
+    {
+      "city": "Luxembourg",
+      "ko_city_name": "룩셈부르크",
+      "country": "Luxembourg",
+      "ko_country_name": "룩셈부르크",
+      "id": 2960316
+    },
+    {
+      "city": "Skopje",
+      "ko_city_name": "스코페",
+      "country": "North Macedonia",
+      "ko_country_name": "북마케도니아",
+      "id": 785842
+    },
+    {
+      "city": "Kuala Lumpur",
+      "ko_city_name": "쿠알라룸푸르",
+      "country": "Malaysia",
+      "ko_country_name": "말레이시아",
+      "id": 1735161
+    },
+    {
+      "city": "Male",
+      "ko_city_name": "말레",
+      "country": "Maldives",
+      "ko_country_name": "몰디브",
+      "id": 1282027
+    },
+    {
+      "city": "Mexico City",
+      "ko_city_name": "멕시코시티",
+      "country": "Mexico",
+      "ko_country_name": "멕시코",
+      "id": 3530597
+    },
+    {
+      "city": "Guadalajara",
+      "ko_city_name": "과달라하라",
+      "country": "Mexico",
+      "ko_country_name": "멕시코",
+      "id": 4005539
+    },
+    {
+      "city": "Ulaanbaatar",
+      "ko_city_name": "울란바토르",
+      "country": "Mongolia",
+      "ko_country_name": "몽골",
+      "id": 2028462
+    },
+    {
+      "city": "Rabat",
+      "ko_city_name": "라바트",
+      "country": "Morocco",
+      "ko_country_name": "모로코",
+      "id": 2538475
+    },
+    {
+      "city": "Yangon",
+      "ko_city_name": "양곤",
+      "country": "Myanmar",
+      "ko_country_name": "미얀마",
+      "id": 1298824
+    },
+    {
+      "city": "Kathmandu",
+      "ko_city_name": "카트만두",
+      "country": "Nepal",
+      "ko_country_name": "네팔",
+      "id": 1283240
+    },
+    {
+      "city": "Amsterdam",
+      "ko_city_name": "암스테르담",
+      "country": "Netherlands",
+      "ko_country_name": "네덜란드",
+      "id": 2759794
+    },
+    {
+      "city": "Wellington",
+      "ko_city_name": "웰링턴",
+      "country": "New Zealand",
+      "ko_country_name": "뉴질랜드",
+      "id": 2179537
+    },
+    {
+      "city": "Auckland",
+      "ko_city_name": "오클랜드",
+      "country": "New Zealand",
+      "ko_country_name": "뉴질랜드",
+      "id": 2193733
+    },
+    {
+      "city": "Oslo",
+      "ko_city_name": "오슬로",
+      "country": "Norway",
+      "ko_country_name": "노르웨이",
+      "id": 3143244
+    }
+  ]
+}
