@@ -14,6 +14,10 @@ struct CurrentWeather: Decodable {
     let weather: [WeatherDetail]
     let main: WeatherMain
     let wind : Wind
+    let dt: Int
+    let id: Int
+    let name: String
+    
     
 }
 struct WeatherDetail: Decodable {
@@ -25,16 +29,28 @@ struct WeatherDetail: Decodable {
 struct Sys:Decodable {
     let sunrise: Int
     let sunset: Int
+    
+    init(sunrise: Int, sunset: Int) {
+        self.sunrise = sunrise
+        self.sunset = sunset
+    }
 }
 
 struct WeatherMain: Decodable {
     let temp: Double
+    let feels_like: Double
     let temp_min: Double
     let temp_max: Double
     let humidity: Double
-    let dt: Int
-    let id: Int
-    let name: String
+    
+    init(temp: Double, feels_like: Double, temp_min: Double, temp_max: Double, humidity: Double) {
+        self.temp = temp
+        self.feels_like = feels_like
+        self.temp_min = temp_min
+        self.temp_max = temp_max
+        self.humidity = humidity
+    }
+
 }
 
 struct Wind: Decodable {

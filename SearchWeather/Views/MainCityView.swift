@@ -49,9 +49,12 @@ final class MainCityView: BaseView {
             make.top.equalTo(dateLabel.snp.bottom).offset(8)
             make.height.equalTo(40)
         }
+        weatherIconImageView.snp.makeConstraints { make in
+            make.size.equalTo(38)
+        }
         tempLabel.snp.makeConstraints { make in
             make.leading.equalTo(safeAreaLayoutGuide).inset(8)
-            make.top.equalTo(weatherLabel.snp.bottom).offset(8)
+            make.top.equalTo(weatherStackView.snp.bottom).offset(8)
             make.height.equalTo(40)
         }
         feelsLabel.snp.makeConstraints { make in
@@ -61,8 +64,9 @@ final class MainCityView: BaseView {
         }
         sunriseSunsetLabel.snp.makeConstraints { make in
             make.leading.equalTo(safeAreaLayoutGuide).inset(8)
+            make.trailing.equalTo(safeAreaLayoutGuide).inset(8)
             make.top.equalTo(feelsLabel.snp.bottom).offset(8)
-            make.height.equalTo(40)
+            make.height.greaterThanOrEqualTo(40)
         }
         pressureHumidityLabel.snp.makeConstraints { make in
             make.leading.equalTo(safeAreaLayoutGuide).inset(8)
@@ -90,24 +94,20 @@ final class MainCityView: BaseView {
         weatherStackView.spacing = 10
         weatherStackView.alignment = .center
         weatherStackView.backgroundColor = .white
-
-        cityLabel.labelDesign(inputText: "가갸아아다아타파나타타다아ㅏ", size: 30)
-        cityLabel.backgroundColor = .white
-        dateLabel.labelDesign(inputText: "dkeinciwnidankv", size: 14)
-        dateLabel.backgroundColor = .white
-        [weatherLabel, tempLabel, feelsLabel, sunriseSunsetLabel, pressureHumidityLabel, todayLabel].forEach{
-            $0.labelDesign(inputText: "dkeinciwnidankv", size: 14)
+        cityLabel.labelDesign(inputText: "", size: 30, weight: .bold)
+        dateLabel.labelDesign(inputText: "", size: 14, weight: .bold)
+        [weatherLabel, tempLabel, feelsLabel, sunriseSunsetLabel, pressureHumidityLabel].forEach{
+            $0.labelDesign(inputText: "", size: 14)
             $0.backgroundColor = .white
-            $0.setContentHuggingPriority(.required, for: .horizontal)
-            $0.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
+        todayLabel.labelDesign(inputText: "  오늘의 사진", size: 14)
         weatherImageView.image = UIImage(systemName: "star")
         weatherImageView.backgroundColor = .gray
         imageBackView.backgroundColor = .white
         
     }
     func updateLayout() {
-        [weatherStackView, tempLabel, feelsLabel, sunriseSunsetLabel, pressureHumidityLabel, imageBackView].forEach{
+        [cityLabel,dateLabel,weatherStackView, weatherImageView, tempLabel, feelsLabel, sunriseSunsetLabel, pressureHumidityLabel, imageBackView].forEach{
             $0.layer.cornerRadius = 8
             $0.clipsToBounds = true
         }

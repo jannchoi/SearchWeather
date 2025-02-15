@@ -45,7 +45,9 @@ enum NetworkRouter: URLRequestConvertible {
             let idString = id.map { String($0) }.joined(separator: ",")
             return [
                 "id": idString,
-                "appid": APIKey.weatherKey
+                "appid": APIKey.weatherKey,
+                "lang": "kr",
+                "units": "metric"
             ]
         case .getWeatherPhoto(let query):
             return [
@@ -56,11 +58,12 @@ enum NetworkRouter: URLRequestConvertible {
         }
     }
     func asURLRequest() throws -> URLRequest {
-        let url = baseURL.appendingPathComponent(path)
-        var request = URLRequest(url: url)
+        var urlString = baseURL.absoluteString
+        urlString += path
+        var request = URLRequest(url: URL(string: urlString)!)
         request.method = method
         request.headers = header
-        let urlRequest = try JSONEncoding.default.encode(request, with: parameters)
+        let urlRequest = try URLEncoding.default.encode(request, with: parameters)
         return urlRequest
     }
 }
@@ -80,7 +83,7 @@ class NetworkManager {
                 case .failure(let error) :
                     let code = response.response?.statusCode
                     completionHandler(.failure(self.getErrorMessage(code: code ?? 500)))
-                    print(error)
+                    print(T.self, error)
                 }
         }
     }
