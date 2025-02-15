@@ -25,11 +25,12 @@ final class MainCityViewModel: BaseViewModel {
         
         var weatherImage: Observable<URL?> = Observable(nil)
         var selectedCity: Observable<City?> = Observable(nil)
+        var cityInfo = CityInfo.decode(fileName: "CityInfo")
     }
     private struct InternalData {
         var weatherInfo: Observable<CurrentWeather?> = Observable(nil)
         var weatherQeury: Observable<String> = Observable("")
-        var cityInfo = CityInfo.decode(fileName: "CityInfo")
+        
     }
     
     init() {
@@ -52,7 +53,7 @@ final class MainCityViewModel: BaseViewModel {
         }
     }
     private func findCityInCityInfo(id: Int) {
-        guard let cityinfo = internalData.cityInfo else {return}
+        guard let cityinfo = output.cityInfo else {return}
         for city in cityinfo.cities {
             if id == city.id {
                 output.selectedCity.value = city
@@ -79,7 +80,6 @@ final class MainCityViewModel: BaseViewModel {
         group.notify(queue: .main) {
             guard let receivedData = self.internalData.weatherInfo.value else {return}
             self.currentWeatherToSelectedWeather(receivedData)
-            print(self.input.selectedCityInfo.value)
         }
 
     }

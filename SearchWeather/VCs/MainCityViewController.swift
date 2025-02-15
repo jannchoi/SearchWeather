@@ -31,7 +31,6 @@ class MainCityViewController: UIViewController {
             self?.showAlert(title: "Error", text: message, button: nil)
         }
         mainViewModel.input.selectedCityInfo.bind { selectedWeather in
-            print(selectedWeather)
             self.updateLabel(selectedWeather)
             self.setWeatherImage(url: selectedWeather.iconURL, targetImage: self.mainView.weatherIconImageView)
             
@@ -99,10 +98,14 @@ class MainCityViewController: UIViewController {
 }
 
 protocol PassDataDelegate {
-    func passCityInfo(selected: SelectedWeatherInfo)
+    func passCityInfo(selected: SelectedWeatherInfo?) -> CityInfo?
 }
 extension MainCityViewController: PassDataDelegate {
-    func passCityInfo(selected: SelectedWeatherInfo) {
-        mainViewModel.input.selectedCityInfo.value = selected
+    func passCityInfo(selected: SelectedWeatherInfo?) -> CityInfo? {
+        if let selected {
+            mainViewModel.input.selectedCityInfo.value = selected
+        }
+        
+        return mainViewModel.output.cityInfo
     }
 }

@@ -16,15 +16,16 @@ struct SearchWeatherViewModel: BaseViewModel {
         var reloadDataTrigger: Observable<Void> = Observable(())
         var selectedCityInfo: Observable<SelectedWeatherInfo?> = Observable(nil)
         var searchedTerm: Observable<String?> = Observable(nil)
+        //var totalCityInfo : Observable<CityInfo?> = Observable(nil)
+        var totalCityInfo = CityInfo.decode(fileName: "CityInfo")
+        
     }
     struct Output {
         var errorMessage: Observable<String> = Observable("")
-        var selectedCity: Observable<City?> = Observable(nil)
+        var selectedCity = Observable([City]())
         var weatherInfo = Observable([CurrentWeather]())
     }
     private struct InternalData {
-
-        var totalCityInfo = CityInfo.decode(fileName: "CityInfo")
         var cityIdList = Observable([Int]())
     }
     
@@ -35,6 +36,7 @@ struct SearchWeatherViewModel: BaseViewModel {
         transform()
     }
     func transform() {
+        output.selectedCity.value = (input.totalCityInfo?.cities)!
         getIdList(nil)
         
         input.searchedTerm.lazyBind { text in
@@ -47,16 +49,19 @@ struct SearchWeatherViewModel: BaseViewModel {
         
     }
     private func getIdList(_ inputText: String?) {
-        guard let cityInfo = internalData.totalCityInfo else {return}
-
+        //guard let cityInfo = input.totalCityInfo.value else {return}
+        guard let cityInfo = input.totalCityInfo else {return}
         if let inputText, inputText != "" {
             var idList = [Int]()
+            var cityList = [City]()
             for i in cityInfo.cities{
                 if i.city.lowercased().contains(inputText) || i.koCityName.contains(inputText) || i.country.lowercased().contains(inputText) ||
                     i.koCountryName.contains(inputText) {
                     idList.append(i.id)
+                    cityList.append(i)
                 }
             }
+            output.selectedCity.value = cityList
             internalData.cityIdList.value = idList
         } else {
             internalData.cityIdList.value = cityInfo.cities.map{$0.id}

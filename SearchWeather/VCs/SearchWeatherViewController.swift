@@ -22,8 +22,9 @@ class SearchWeatherViewController: UIViewController {
         bindData()
     }
     private func bindData() {
+        //searchViewModel.input.totalCityInfo.value = contents?.passCityInfo(selected: nil)
+        //print(contents?.passCityInfo(selected: nil))
         searchViewModel.output.weatherInfo.lazyBind { list in
-            print(list.count)
             self.mainView.cityTableView.reloadData()
         }
         searchViewModel.output.errorMessage.lazyBind {[weak self] message in
@@ -39,11 +40,13 @@ class SearchWeatherViewController: UIViewController {
 }
 extension SearchWeatherViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+
         return searchViewModel.output.weatherInfo.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchWeatherTableViewCell.id) as? SearchWeatherTableViewCell else {return UITableViewCell()}
+        cell.configureData(weather: searchViewModel.output.weatherInfo.value[indexPath.row], city: searchViewModel.output.selectedCity.value[indexPath.row])
         
         return cell
     }
@@ -54,6 +57,9 @@ extension SearchWeatherViewController: UITableViewDelegate, UITableViewDataSourc
         guard let city else {return}
         contents?.passCityInfo(selected: city)
         navigationController?.popViewController(animated: true)
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 90
     }
 
 }

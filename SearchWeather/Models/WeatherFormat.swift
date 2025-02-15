@@ -13,6 +13,7 @@ struct WeatherFormat {
     static let location = "  %@,%@  "
     static let description = "  오늘의 날씨는 %@입니다.  "
     static let temp = "  현재 온도는 %.1f°입니다. 최저 %.1f° 최고 %.1f°  "
+    static let tempMinMax = "최저 %.1f° 최고 %.1f°"
     static let feelsList = "  체감 온도는 %.1f°입니다.  "
     static let sunriseSunset = "  %@의 일출 시각은 %@, 일몰 시각은 %@입니다.  "
     static let humidityWind = "  습도는 %.1f%, 풍속은 %.1f m/s입니다.  "

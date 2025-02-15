@@ -26,6 +26,7 @@ final class SearchWeatherView : BaseView {
         }
     }
     override func configureView() {
+        backgroundColor = .white
         cityTableView.register(SearchWeatherTableViewCell.self, forCellReuseIdentifier: SearchWeatherTableViewCell.id)
     }
 }

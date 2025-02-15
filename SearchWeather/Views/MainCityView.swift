@@ -90,6 +90,7 @@ final class MainCityView: BaseView {
         }
     }
     override func configureView() {
+        backgroundColor = .white
         weatherStackView.axis = .horizontal
         weatherStackView.spacing = 10
         weatherStackView.alignment = .center
