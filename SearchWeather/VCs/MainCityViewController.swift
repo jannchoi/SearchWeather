@@ -19,23 +19,21 @@ class MainCityViewController: UIViewController {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .brown
-        
         setNavigationBar()
         bindData()
     }
+
     
     private func bindData() {
         
         mainViewModel.output.errorMessage.lazyBind {[weak self] message in
             self?.showAlert(title: "Error", text: message, button: nil)
         }
-        mainViewModel.input.selectedCityInfo.bind { selectedWeather in
-            self.updateLabel(selectedWeather)
-            self.setWeatherImage(url: selectedWeather.iconURL, targetImage: self.mainView.weatherIconImageView)
-            
+        mainViewModel.output.selectedWeather.lazyBind { selected in
+            guard let selected else {return}
+            self.updateLabel(selected)
+            self.setWeatherImage(url: selected.weather.first?.icon.getWeatherIconURL(), targetImage: self.mainView.weatherIconImageView)
         }
-
         mainViewModel.output.weatherImage.lazyBind { img in
             self.setWeatherImage(url: img, targetImage: self.mainView.weatherImageView)
 
@@ -53,12 +51,12 @@ class MainCityViewController: UIViewController {
         }
         
     }
-    private func updateLabel(_ model : SelectedWeatherInfo) {
+    private func updateLabel(_ model : CurrentWeather) {
         
         mainView.dateLabel.text = model.dt.dateFormat()
         
-        var formattedString = String(format: WeatherFormat.description, model.description)
-        mainView.weatherLabel.attributedText = WeatherFormat.attributedSubstring(text: formattedString, arguments: [model.description])
+        var formattedString = String(format: WeatherFormat.description, model.weather.first?.description ?? "")
+        mainView.weatherLabel.attributedText = WeatherFormat.attributedSubstring(text: formattedString, arguments: [model.weather.first?.description ?? ""])
 
         formattedString = String(format: WeatherFormat.temp, model.main.temp, model.main.temp_min, model.main.temp_max)
         mainView.tempLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.main.temp], grayTarget: [model.main.temp_min, model.main.temp_max])
@@ -66,13 +64,13 @@ class MainCityViewController: UIViewController {
         formattedString = String(format: WeatherFormat.feelsList, model.main.feels_like)
         mainView.feelsLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.main.feels_like], grayTarget: nil)
 
-        formattedString = String(format: WeatherFormat.sunriseSunset, model.name, model.sys.sunrise.formatTime(), model.sys.sunset.formatTime())
+        formattedString = String(format: WeatherFormat.sunriseSunset, mainViewModel.output.selectedCity.value?.koCityName ?? model.name, model.sys.sunrise.formatTime(), model.sys.sunset.formatTime())
         mainView.sunriseSunsetLabel.attributedText = WeatherFormat.attributedSubstring(text: formattedString, arguments: [model.sys.sunrise.formatTime(), model.sys.sunset.formatTime()])
         mainView.sunriseSunsetLabel.snp.makeConstraints { make in
             make.height.equalTo(mainView.sunriseSunsetLabel.intrinsicContentSize.height)
         }
-        formattedString = String(format: WeatherFormat.humidityWind, model.main.humidity, model.windSpeed)
-        mainView.pressureHumidityLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.main.humidity, model.windSpeed], grayTarget: nil)
+        formattedString = String(format: WeatherFormat.humidityWind, model.main.humidity, model.wind.speed)
+        mainView.pressureHumidityLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.main.humidity, model.wind.speed], grayTarget: nil)
         view.layoutIfNeeded()
     }
     private func setNavigationBar() {
@@ -88,6 +86,7 @@ class MainCityViewController: UIViewController {
     }
     @objc private func searchButtonTapped() {
         let vc = SearchWeatherViewController()
+        vc.delegate = self
         navigationController?.pushViewController(vc, animated: true)
         
     }
@@ -98,14 +97,14 @@ class MainCityViewController: UIViewController {
 }
 
 protocol PassDataDelegate {
-    func passCityInfo(selected: SelectedWeatherInfo?) -> CityInfo?
+    func passCityInfo() -> CityInfo?
+    func passSelectedCityID(id: Int)
 }
 extension MainCityViewController: PassDataDelegate {
-    func passCityInfo(selected: SelectedWeatherInfo?) -> CityInfo? {
-        if let selected {
-            mainViewModel.input.selectedCityInfo.value = selected
-        }
-        
+    func passCityInfo() -> CityInfo? {
         return mainViewModel.output.cityInfo
+    }
+    func passSelectedCityID(id: Int) {
+        mainViewModel.input.selectedCityID.value = id
     }
 }

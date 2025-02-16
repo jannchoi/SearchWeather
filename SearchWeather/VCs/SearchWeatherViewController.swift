@@ -11,7 +11,7 @@ class SearchWeatherViewController: UIViewController {
 
     let mainView = SearchWeatherView()
     let searchViewModel = SearchWeatherViewModel()
-    var contents: PassDataDelegate?
+    var delegate: PassDataDelegate?
     
     override func loadView() {
         view = mainView
@@ -19,16 +19,29 @@ class SearchWeatherViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setDelegate()
+        setNavigationBar()
         bindData()
+        mainView.searchBar.placeholder = "지금, 날씨가 궁금한 곳은?"
+        
+    }
+    private func setNavigationBar() {
+        navigationItem.title = "도시 검색"
     }
     private func bindData() {
-        //searchViewModel.input.totalCityInfo.value = contents?.passCityInfo(selected: nil)
-        //print(contents?.passCityInfo(selected: nil))
-        searchViewModel.output.weatherInfo.lazyBind { list in
+        searchViewModel.input.totalCityInfo.value = delegate?.passCityInfo()
+        
+        searchViewModel.output.cityWeatherInfo.lazyBind { list in
             self.mainView.cityTableView.reloadData()
         }
         searchViewModel.output.errorMessage.lazyBind {[weak self] message in
             self?.showAlert(title: "Error", text: message, button: nil)
+        }
+        searchViewModel.output.showEmptyLabel.lazyBind { showempty in
+            if showempty {
+                self.mainView.cityTableView.isHidden = true
+            }else  {
+                self.mainView.cityTableView.isHidden = false
+            }
         }
     }
     private func setDelegate() {
@@ -41,21 +54,17 @@ class SearchWeatherViewController: UIViewController {
 extension SearchWeatherViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
-        return searchViewModel.output.weatherInfo.value.count
+        return searchViewModel.output.cityWeatherInfo.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchWeatherTableViewCell.id) as? SearchWeatherTableViewCell else {return UITableViewCell()}
-        cell.configureData(weather: searchViewModel.output.weatherInfo.value[indexPath.row], city: searchViewModel.output.selectedCity.value[indexPath.row])
-        
+        cell.configureData(cityWeather: searchViewModel.output.cityWeatherInfo.value[indexPath.row])
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedCity =  searchViewModel.output.weatherInfo.value[indexPath.row]
-        var city : SelectedWeatherInfo?
-        city?.currentWeatherToSelectedWeather(selectedCity)
-        guard let city else {return}
-        contents?.passCityInfo(selected: city)
+        let selectedCity =  searchViewModel.output.cityWeatherInfo.value[indexPath.row]
+        delegate?.passSelectedCityID(id: selectedCity.cityId)
         navigationController?.popViewController(animated: true)
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

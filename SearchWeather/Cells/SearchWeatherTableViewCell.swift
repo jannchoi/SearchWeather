@@ -18,14 +18,15 @@ class SearchWeatherTableViewCell: BaseTableViewCell {
     private let weatherIcon = UIImageView()
     private let tempLabel = UILabel()
     
-    func configureData(weather: CurrentWeather, city: City ) {
-        cityLabel.text = city.koCityName
-        countryLabel.text = city.koCityName
-        tempMinMaxLabel.text = String(format: WeatherFormat.tempMinMax, weather.main.temp_min, weather.main.temp_max)
-        guard let url = weather.weather[0].icon.getWeatherIconURL() else {return}
+    func configureData(cityWeather: CityWeather) {
+        cityLabel.text = cityWeather.koCityName
+        countryLabel.text = cityWeather.koCountryName
+        tempMinMaxLabel.text = String(format: WeatherFormat.tempMinMax, cityWeather.tempMin, cityWeather.tempMax)
+        guard let url = cityWeather.icon.getWeatherIconURL() else {return}
         weatherIcon.kf.setImage(with: url)
-        tempLabel.text = "\(weather.main.temp)°"
+        tempLabel.text = "\(cityWeather.temp)°"
     }
+
     
     override func configureHierachy() {
         contentView.addSubview(cityLabel)
@@ -34,6 +35,7 @@ class SearchWeatherTableViewCell: BaseTableViewCell {
         contentView.addSubview(weatherIcon)
         contentView.addSubview(tempLabel)
     }
+    
     override func configureLayout() {
         cityLabel.snp.makeConstraints { make in
             make.top.leading.equalToSuperview().inset(8)
@@ -46,27 +48,31 @@ class SearchWeatherTableViewCell: BaseTableViewCell {
         }
         tempMinMaxLabel.snp.makeConstraints { make in
             make.leading.equalTo(cityLabel)
-            make.top.equalTo(countryLabel.snp.bottom).offset(20)
             make.height.equalTo(15)
+            make.bottom.equalToSuperview().inset(8)
         }
         weatherIcon.snp.makeConstraints { make in
             make.top.trailing.equalToSuperview().inset(8)
             make.size.equalTo(40)
         }
         tempLabel.snp.makeConstraints { make in
-            make.top.equalTo(weatherIcon.snp.bottom).offset(10)
+            make.centerY.equalTo(tempMinMaxLabel)
             make.trailing.equalToSuperview().inset(8)
             make.height.equalTo(45)
         }
+    }
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4))
     }
     override func configureView() {
         cityLabel.font = UIFont.boldSystemFont(ofSize: 14)
         countryLabel.font = UIFont.systemFont(ofSize: 12)
         tempMinMaxLabel.font = UIFont.systemFont(ofSize: 12)
         tempLabel.font = UIFont.boldSystemFont(ofSize: 20)
-        backgroundColor = .purple.withAlphaComponent(0.3)
+        contentView.backgroundColor = .purpleCell
         DispatchQueue.main.async {
-            self.layer.cornerRadius = 8
+            self.contentView.layer.cornerRadius = 8
         }
     }
 
