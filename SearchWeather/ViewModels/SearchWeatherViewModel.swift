@@ -23,10 +23,13 @@ struct SearchWeatherViewModel: BaseViewModel {
         var errorMessage: Observable<String> = Observable("")
         var cityWeatherInfo = Observable([CityWeather]())
         var showEmptyLabel = Observable(false)
+        var weatherPhotoList = Observable([URL?]())
     }
     private struct InternalData {
         var cityIdList = Observable([Int]())
         var weatherInfo = Observable([CurrentWeather]())
+        var weatherQeuryList = Observable([String]())
+        
     }
     
     init() {
@@ -87,7 +90,6 @@ struct SearchWeatherViewModel: BaseViewModel {
         
     }
     private func getWeather(_ inputID: [Int]) {
-
         NetworkManager.shared.callRequest(target: .getWeatherInfo(id: inputID),model: Weather.self) { response in
             switch response {
             case .success(let value) :
@@ -99,8 +101,11 @@ struct SearchWeatherViewModel: BaseViewModel {
                 }
             }
         }
+        
     }
     private func mappingCityWeather() {
+        let group = DispatchGroup()
+        group.enter()
         guard let cityInfo = input.totalCityInfo.value else {return}
         let cityList = cityInfo.cities
         let weatehrList = internalData.weatherInfo.value
@@ -113,6 +118,38 @@ struct SearchWeatherViewModel: BaseViewModel {
                 mapped.append(cityweather)
             }
         }
-        output.cityWeatherInfo.value = mapped
+        group.leave()
+        
+        let resultCityInfo = mapped.sorted{$0.koCountryName < $1.koCountryName}
+        internalData.weatherQeuryList.value = resultCityInfo.map{$0.description}
+        getWeatherPhoto(internalData.weatherQeuryList.value, cityInfo: resultCityInfo , group: group)
+
+    }
+    private func getWeatherPhoto(_ queryList: [String], cityInfo: [CityWeather], group: DispatchGroup ) {
+
+        var result = [URL?]()
+        for description in queryList {
+            group.enter()
+            NetworkManager.shared.callRequest(target: .getWeatherPhoto(query: description),model: Photo.self) { response in
+                switch response {
+                case .success(let value) :
+                    if let photo = value.results.first, let url = photo.urls.thumb {
+                        result.append( URL(string: url))
+                    } else {
+                        result.append(nil)
+                    }
+                    group.leave()
+                case .failure(let failure) :
+                    if let errorType = failure as? NetworkError {
+                        self.output.errorMessage.value = errorType.errorMessage
+                    }
+                    group.leave()
+                }
+            }
+        }
+        group.notify(queue: .main) {
+            self.output.cityWeatherInfo.value = cityInfo
+            output.weatherPhotoList.value = result
+        }
     }
 }

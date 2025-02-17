@@ -47,7 +47,7 @@ final class MainCityView: BaseView {
         weatherStackView.snp.makeConstraints { make in
             make.leading.equalTo(safeAreaLayoutGuide).inset(8)
             make.top.equalTo(dateLabel.snp.bottom).offset(8)
-            make.height.equalTo(40)
+            make.height.equalTo(45)
         }
         weatherIconImageView.snp.makeConstraints { make in
             make.size.equalTo(38)
@@ -55,23 +55,21 @@ final class MainCityView: BaseView {
         tempLabel.snp.makeConstraints { make in
             make.leading.equalTo(safeAreaLayoutGuide).inset(8)
             make.top.equalTo(weatherStackView.snp.bottom).offset(8)
-            make.height.equalTo(40)
+            make.height.equalTo(45)
         }
         feelsLabel.snp.makeConstraints { make in
             make.leading.equalTo(safeAreaLayoutGuide).inset(8)
             make.top.equalTo(tempLabel.snp.bottom).offset(8)
-            make.height.equalTo(40)
+            make.height.equalTo(45)
         }
         sunriseSunsetLabel.snp.makeConstraints { make in
-            make.leading.equalTo(safeAreaLayoutGuide).inset(8)
-            make.trailing.equalTo(safeAreaLayoutGuide).inset(8)
+            make.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(8)
             make.top.equalTo(feelsLabel.snp.bottom).offset(8)
-            make.height.greaterThanOrEqualTo(40)
         }
         pressureHumidityLabel.snp.makeConstraints { make in
             make.leading.equalTo(safeAreaLayoutGuide).inset(8)
             make.top.equalTo(sunriseSunsetLabel.snp.bottom).offset(8)
-            make.height.equalTo(40)
+            make.height.equalTo(45)
         }
         imageBackView.snp.makeConstraints { make in
             make.top.equalTo(pressureHumidityLabel.snp.bottom).offset(8)
@@ -103,7 +101,7 @@ final class MainCityView: BaseView {
         }
         todayLabel.labelDesign(inputText: "  오늘의 사진", size: 14)
         weatherImageView.image = UIImage(systemName: "star")
-        weatherImageView.backgroundColor = .gray
+        weatherImageView.backgroundColor = .white
         imageBackView.backgroundColor = .white
         
     }

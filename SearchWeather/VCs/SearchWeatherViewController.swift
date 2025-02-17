@@ -30,8 +30,9 @@ class SearchWeatherViewController: UIViewController {
     private func bindData() {
         searchViewModel.input.totalCityInfo.value = delegate?.passCityInfo()
         
-        searchViewModel.output.cityWeatherInfo.lazyBind { list in
+        searchViewModel.output.weatherPhotoList.lazyBind { list in
             self.mainView.cityTableView.reloadData()
+
         }
         searchViewModel.output.errorMessage.lazyBind {[weak self] message in
             self?.showAlert(title: "Error", text: message, button: nil)
@@ -59,7 +60,7 @@ extension SearchWeatherViewController: UITableViewDelegate, UITableViewDataSourc
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchWeatherTableViewCell.id) as? SearchWeatherTableViewCell else {return UITableViewCell()}
-        cell.configureData(cityWeather: searchViewModel.output.cityWeatherInfo.value[indexPath.row])
+        cell.configureData(cityWeather: searchViewModel.output.cityWeatherInfo.value[indexPath.row], photo:  searchViewModel.output.weatherPhotoList.value[indexPath.row])
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -69,6 +70,9 @@ extension SearchWeatherViewController: UITableViewDelegate, UITableViewDataSourc
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 90
+    }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        mainView.searchBar.resignFirstResponder()
     }
 
 }

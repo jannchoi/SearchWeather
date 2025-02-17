@@ -39,6 +39,7 @@ final class MainCityViewModel: BaseViewModel {
         input.selectedCityID.bind { id in
             self.getWeather([id])
             self.findCityInCityInfo(id: id)
+            UserDefaultsManager.cityID = id
         }
         internalData.weatherQeury.lazyBind { _ in
             self.getWeatherPhoto()

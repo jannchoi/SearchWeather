@@ -17,18 +17,25 @@ class SearchWeatherTableViewCell: BaseTableViewCell {
     private let tempMinMaxLabel = UILabel()
     private let weatherIcon = UIImageView()
     private let tempLabel = UILabel()
+    private let weatherPhoto = UIImageView()
     
-    func configureData(cityWeather: CityWeather) {
+    func configureData(cityWeather: CityWeather, photo: URL?) {
         cityLabel.text = cityWeather.koCityName
         countryLabel.text = cityWeather.koCountryName
         tempMinMaxLabel.text = String(format: WeatherFormat.tempMinMax, cityWeather.tempMin, cityWeather.tempMax)
         guard let url = cityWeather.icon.getWeatherIconURL() else {return}
         weatherIcon.kf.setImage(with: url)
         tempLabel.text = "\(cityWeather.temp)°"
+        if let photo {
+            weatherPhoto.kf.setImage(with: photo)
+            weatherPhoto.alpha = 0.5
+        }
     }
+    
 
     
     override func configureHierachy() {
+        contentView.addSubview(weatherPhoto)
         contentView.addSubview(cityLabel)
         contentView.addSubview(countryLabel)
         contentView.addSubview(tempMinMaxLabel)
@@ -37,6 +44,9 @@ class SearchWeatherTableViewCell: BaseTableViewCell {
     }
     
     override func configureLayout() {
+        weatherPhoto.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         cityLabel.snp.makeConstraints { make in
             make.top.leading.equalToSuperview().inset(8)
             make.height.equalTo(20)
