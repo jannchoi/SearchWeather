@@ -25,5 +25,6 @@ struct CityWeather {
     let dateTime: Int
     let feels: Double
     let humidity: Double
+    var weatherImage: URL?
 }
 

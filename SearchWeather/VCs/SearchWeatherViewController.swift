@@ -27,11 +27,16 @@ class SearchWeatherViewController: UIViewController {
     }
     private func setNavigationBar() {
         navigationItem.title = "도시 검색"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: .plain, target: self, action: #selector(backButtonTapped))
+        navigationItem.leftBarButtonItem?.tintColor = .black
+    }
+    @objc private func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
     }
     private func bindData() {
         searchViewModel.input.totalCityInfo.value = delegate?.passCityInfo()
         
-        searchViewModel.output.weatherPhotoList.lazyBind { list in
+        searchViewModel.output.filteredCityWeather.lazyBind { list in
             self.mainView.cityTableView.reloadData()
 
         }
@@ -56,23 +61,23 @@ class SearchWeatherViewController: UIViewController {
         mainView.cityTableView.refreshControl?.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
     }
     @objc func refreshTableView() {
-        searchViewModel.input.searchedTerm.value = mainView.searchBar.text
+        searchViewModel.input.reloadData.value = ()
         mainView.cityTableView.refreshControl?.endRefreshing()
     }
 }
 extension SearchWeatherViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
-        return searchViewModel.output.cityWeatherInfo.value.count
+        return searchViewModel.output.filteredCityWeather.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchWeatherTableViewCell.id) as? SearchWeatherTableViewCell else {return UITableViewCell()}
-        cell.configureData(cityWeather: searchViewModel.output.cityWeatherInfo.value[indexPath.row], photo:  searchViewModel.output.weatherPhotoList.value[indexPath.row])
+        cell.configureData(cityWeather: searchViewModel.output.filteredCityWeather.value[indexPath.row])
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedCity =  searchViewModel.output.cityWeatherInfo.value[indexPath.row]
+        let selectedCity =  searchViewModel.output.filteredCityWeather.value[indexPath.row]
         delegate?.passSelectedCityID(cityWeather: selectedCity)
         navigationController?.popViewController(animated: true)
     }

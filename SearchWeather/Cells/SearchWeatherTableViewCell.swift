@@ -19,16 +19,18 @@ class SearchWeatherTableViewCell: BaseTableViewCell {
     private let tempLabel = UILabel()
     private let weatherPhoto = UIImageView()
     
-    func configureData(cityWeather: CityWeather, photo: URL?) {
+    func configureData(cityWeather: CityWeather) {
         cityLabel.text = cityWeather.koCityName
         countryLabel.text = cityWeather.koCountryName
         tempMinMaxLabel.text = String(format: WeatherFormat.tempMinMax, cityWeather.tempMin, cityWeather.tempMax)
         guard let url = cityWeather.icon.getWeatherIconURL() else {return}
         weatherIcon.kf.setImage(with: url)
         tempLabel.text = "\(cityWeather.temp)°"
-        if let photo {
+        if let photo = cityWeather.weatherImage {
             weatherPhoto.kf.setImage(with: photo)
             weatherPhoto.alpha = 0.5
+        }else {
+            weatherPhoto.image = UIImage(systemName: "heart")
         }
     }
     

@@ -11,12 +11,12 @@ import UIKit
 struct WeatherFormat {
     
     static let location = "  %@,%@  "
-    static let description = "  오늘의 날씨는 %@입니다.  "
+    static let description = "오늘의 날씨는 %@입니다.  "
     static let temp = "  현재 온도는 %.1f°입니다. 최저 %.1f° 최고 %.1f°  "
     static let tempMinMax = "최저 %.1f° 최고 %.1f°"
     static let feelsList = "  체감 온도는 %.1f°입니다.  "
     static let sunriseSunset = "  %@의 일출 시각은 %@, 일몰 시각은 %@입니다.  "
-    static let humidityWind = "  습도는 %.1f%, 풍속은 %.1f m/s입니다.  "
+    static let humidityWind = "  습도는 %.1f%%, 풍속은 %.1fm/s입니다.  "
     
     
     static func attributedSubstring(text: String, arguments: [String]) -> NSMutableAttributedString {
@@ -34,17 +34,20 @@ struct WeatherFormat {
         let attributedString = NSMutableAttributedString(string: text)
         
         for target in boldTarget {
-            let argument = String(format:" %.1f", target)
-            let range = (text as NSString).range(of: argument)
-            let bold = UIFont.boldSystemFont(ofSize: 14)
-            if temp {
-                if target >= 30 {
-                    attributedString.addAttribute(.foregroundColor, value: UIColor.systemOrange, range: range)
-                } else if target < 0{
-                    attributedString.addAttribute(.foregroundColor, value: UIColor.systemBlue, range: range)
+            let arguments = [String(format: " %.1f°", target), String(format: " %.1fm/s", target), String(format: " %.1f%%", target)]
+            for argument in arguments {
+                let range = (text as NSString).range(of: argument)
+                let bold = UIFont.boldSystemFont(ofSize: 14)
+                if temp {
+                    if target >= 30 {
+                        attributedString.addAttribute(.foregroundColor, value: UIColor.systemOrange, range: range)
+                    } else if target < 0{
+                        attributedString.addAttribute(.foregroundColor, value: UIColor.systemBlue, range: range)
+                    }
                 }
+                attributedString.addAttribute(.font, value: bold, range: range)
             }
-            attributedString.addAttribute(.font, value: bold, range: range)
+
         }
         
         if let grayTarget = grayTarget {

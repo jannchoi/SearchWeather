@@ -9,7 +9,6 @@ import UIKit
 import Kingfisher
 import SnapKit
 
-
 class MainCityViewController: UIViewController {
     let mainView = MainCityView()
     let mainViewModel = MainCityViewModel()
@@ -21,6 +20,9 @@ class MainCityViewController: UIViewController {
         super.viewDidLoad()
         setNavigationBar()
         bindData()
+//        mainView.forecastButton.addAction(UIAction(handler: { _ in
+//            self.present(PageViewController(), animated: true)
+//        }), for: .touchUpInside)
     }
 
     
@@ -33,11 +35,8 @@ class MainCityViewController: UIViewController {
             guard let cityWeather else {return}
             self.updateLabel(cityWeather)
             self.setWeatherImage(url: cityWeather.icon.getWeatherIconURL(), targetImage: self.mainView.weatherIconImageView)
-            self.mainView.cityLabel.text = String(format: WeatherFormat.location, cityWeather.koCountryName, cityWeather.koCityName)
-        }
-        mainViewModel.output.weatherImage.lazyBind { img in
-            self.setWeatherImage(url: img, targetImage: self.mainView.weatherImageView)
-
+            self.setWeatherImage(url: cityWeather.weatherImage, targetImage: self.mainView.weatherImageView)
+            
         }
     }
     private func setWeatherImage(url: URL?, targetImage: UIImageView) {
@@ -46,10 +45,12 @@ class MainCityViewController: UIViewController {
         } else {
             targetImage.image = UIImage(systemName: "star")
         }
-        
     }
     private func updateLabel(_ model : CityWeather) {
         
+        //city
+        mainView.cityLabel.text = String(format: WeatherFormat.location, model.koCountryName, model.koCityName)
+        //date
         mainView.dateLabel.text = model.dateTime.dateFormat()
         
         // description
@@ -96,12 +97,12 @@ class MainCityViewController: UIViewController {
 }
 
 protocol PassDataDelegate {
-    func passCityInfo() -> CityInfo?
+    func passCityInfo() -> [City]?
     func passSelectedCityID(cityWeather: CityWeather)
 }
 extension MainCityViewController: PassDataDelegate {
-    func passCityInfo() -> CityInfo? {
-        return mainViewModel.output.cityInfo
+    func passCityInfo() -> [City]? {
+        return mainViewModel.output.cityInfo?.cities.sorted{$0.koCountryName < $1.koCountryName}
     }
     func passSelectedCityID(cityWeather: CityWeather) {
         mainViewModel.input.selectedCityWeather.value = cityWeather

@@ -11,12 +11,15 @@ import Alamofire
 enum NetworkRouter: URLRequestConvertible {
     case getWeatherInfo(id: [Int])
     case getWeatherPhoto(query: String)
+    case getForecast(id: Int)
     var baseURL: URL {
         switch self {
         case .getWeatherInfo :
             return URL(string: "https://api.openweathermap.org/data/2.5/group")!
         case .getWeatherPhoto :
             return URL(string: "https://api.unsplash.com/search/photos")!
+        case .getForecast :
+            return URL(string: "api.openweathermap.org/data/2.5/forecast")!
         }
     }
     var method: HTTPMethod {
@@ -24,18 +27,17 @@ enum NetworkRouter: URLRequestConvertible {
     }
     var header: HTTPHeaders {
         switch self {
-        case .getWeatherInfo:
+        case .getWeatherInfo, .getForecast:
             return ["Content-Type": "application/json"]
         case .getWeatherPhoto:
             return ["Authorization": "Client-ID \(APIKey.photoKey)"]
+            
         }
 
     }
     var path: String {
         switch self {
-        case .getWeatherInfo :
-            return ""
-        case .getWeatherPhoto :
+        case .getWeatherInfo, .getForecast, .getWeatherPhoto :
             return ""
         }
     }
@@ -54,6 +56,12 @@ enum NetworkRouter: URLRequestConvertible {
                 "query": query,
                 "page": 1,
                 "per_page": 1
+            ]
+        case .getForecast(let id) :
+            return [
+                "id": String(id),
+                "appid": APIKey.weatherKey,
+                "lang": "kr",
             ]
         }
     }
@@ -87,6 +95,7 @@ class NetworkManager {
                 }
         }
     }
+    // 0 8 16 24 32 40
     private func getErrorMessage(code: Int) -> NetworkError {
         switch code {
         case 400 : return .badRequest

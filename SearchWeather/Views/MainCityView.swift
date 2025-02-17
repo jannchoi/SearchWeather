@@ -16,7 +16,7 @@ final class MainCityView: BaseView {
     let weatherLabel = UILabel()
     let tempLabel = UILabel()
     let feelsLabel = UILabel()
-    let sunriseSunsetLabel = UILabel()
+    let sunriseSunsetLabel = PaddingLabel()
     let pressureHumidityLabel = UILabel()
     let imageBackView = UIView()
     let todayLabel = UILabel()

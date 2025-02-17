@@ -15,19 +15,19 @@ struct SearchWeatherViewModel: BaseViewModel {
     struct Input {
         var selectedCityInfo: Observable<SelectedWeatherInfo?> = Observable(nil)
         var searchedTerm: Observable<String?> = Observable(nil)
-        var totalCityInfo : Observable<CityInfo?> = Observable(nil)
+        var totalCityInfo : Observable<[City]?> = Observable(nil)
+        var reloadData: Observable<Void> = Observable(())
         
     }
     struct Output {
         var errorMessage: Observable<String> = Observable("")
-        var cityWeatherInfo = Observable([CityWeather]())
         var showEmptyLabel = Observable(false)
-        var weatherPhotoList = Observable([URL?]())
+        var filteredCityWeather = Observable([CityWeather]())
     }
     private struct InternalData {
-        var cityIdList = Observable([Int]())
         var weatherInfo = Observable([CurrentWeather]())
-        var weatherQeuryList = Observable([String]())
+        var cityWeatherInfo = Observable([CityWeather]())
+        var weatherImageUrlList = Observable([URL?]())
         
     }
     
@@ -38,6 +38,9 @@ struct SearchWeatherViewModel: BaseViewModel {
         transform()
     }
     func transform() {
+        input.reloadData.lazyBind { _ in
+            getIdList(nil)
+        }
         input.totalCityInfo.lazyBind { cityinfo in
             guard cityinfo != nil else {return}
             getIdList(nil)
@@ -49,94 +52,91 @@ struct SearchWeatherViewModel: BaseViewModel {
             inputText = inputText.lowercased()
             getIdList(inputText)
         }
-        internalData.weatherInfo.bind { _ in
-            self.mappingCityWeather()
-        }
     }
     
     private func getIdList(_ inputText: String?) {
         internalData.weatherInfo.value.removeAll()
         guard let cityInfo = input.totalCityInfo.value else {return}
         
-        if let inputText, inputText != "" {
-            var idList = [Int]()
-            for i in cityInfo.cities{
-                if i.city.lowercased().contains(inputText) || i.koCityName.contains(inputText) || i.country.lowercased().contains(inputText) ||
-                    i.koCountryName.contains(inputText) {
-                    idList.append(i.id)
+        if let inputText {// used, 정상검색어
+            if !inputText.isEmpty {
+                var tempCityWeather = [CityWeather]()
+                for (idx,city) in cityInfo.enumerated(){
+                    if city.city.lowercased().contains(inputText) || city.koCityName.contains(inputText) || city.country.lowercased().contains(inputText) ||
+                        city.koCountryName.contains(inputText) {
+                        tempCityWeather.append(internalData.cityWeatherInfo.value[idx])
+                    }
                 }
+                if tempCityWeather.isEmpty {
+                    output.showEmptyLabel.value = true
+                    output.filteredCityWeather.value = internalData.cityWeatherInfo.value
+                    return
+                }
+                output.filteredCityWeather.value = tempCityWeather
+
+            } else { // 공백 검색
+                output.filteredCityWeather.value = internalData.cityWeatherInfo.value
             }
-            internalData.cityIdList.value = idList
-            if idList.isEmpty {
-                output.showEmptyLabel.value = true
-                return
-            }
-        } else {
-            internalData.cityIdList.value = cityInfo.cities.map{$0.id}
+            
+        } else { // initial / refresh
+            internalData.weatherImageUrlList.value.removeAll()
+            getQueryID()
         }
         output.showEmptyLabel.value = false
-        getQueryID()
+
     }
     private func getQueryID() {
-
-        let cityCount = internalData.cityIdList.value.count
+        guard let cityInfo = input.totalCityInfo.value else {return}
+        let infoList = cityInfo.map{$0.id}
+        let cityCount = infoList.count
         let loopCount = (cityCount / 20)
+        let group = DispatchGroup()
         for i in 0...loopCount {
             let lastIdx = min((i + 1) * 20, cityCount)
-            let tempList = Array(internalData.cityIdList.value[i*20..<lastIdx])
-            getWeather(tempList)
+            let tempList = Array(infoList[i*20..<lastIdx])
+            group.enter()
+            getWeather(tempList, group: group)
+        }
+        group.notify(queue: .main) {
+            self.getWeatherPhoto()
         }
         
     }
-    private func getWeather(_ inputID: [Int]) {
+    private func getWeather(_ inputID: [Int], group: DispatchGroup) {
         NetworkManager.shared.callRequest(target: .getWeatherInfo(id: inputID),model: Weather.self) { response in
             switch response {
             case .success(let value) :
                 self.internalData.weatherInfo.value.append(contentsOf: value.list)
+                group.leave()
             case .failure(let failure) :
                 if let errorType = failure as? NetworkError {
                     self.output.errorMessage.value = errorType.errorMessage
-                    print(inputID)
                 }
+                group.leave()
             }
         }
         
     }
-    private func mappingCityWeather() {
+    
+    private func getWeatherPhoto() {
         let group = DispatchGroup()
-        group.enter()
-        guard let cityInfo = input.totalCityInfo.value else {return}
-        let cityList = cityInfo.cities
-        let weatehrList = internalData.weatherInfo.value
-        var mapped = [CityWeather]()
-        
-        for city in cityList {
-            if let weather = weatehrList.first(where: {$0.id == city.id}) {
-                let cityweather = CityWeather(cityName: city.city, koCityName: city.koCityName, countryName: city.country, koCountryName: city.koCountryName, cityId: city.id, temp: weather.main.temp, tempMin: weather.main.temp_min, tempMax: weather.main.temp_max, description: weather.weather[0].description, icon: weather.weather[0].icon, windSpeed: weather.wind.speed, sunrise: weather.sys.sunrise, sunset: weather.sys.sunset, dateTime: weather.dt, feels: weather.main.feels_like, humidity: weather.main.humidity)
-                
-                mapped.append(cityweather)
-            }
-        }
-        group.leave()
-        
-        let resultCityInfo = mapped.sorted{$0.koCountryName < $1.koCountryName}
-        internalData.weatherQeuryList.value = resultCityInfo.map{$0.description}
-        getWeatherPhoto(internalData.weatherQeuryList.value, cityInfo: resultCityInfo , group: group)
-
-    }
-    private func getWeatherPhoto(_ queryList: [String], cityInfo: [CityWeather], group: DispatchGroup ) {
-
-        var result = [URL?]()
-        for description in queryList {
+        let queryList = internalData.weatherInfo.value.map{$0.weather.first?.main}
+        for i in queryList.indices {
             group.enter()
-            NetworkManager.shared.callRequest(target: .getWeatherPhoto(query: description),model: Photo.self) { response in
+            var weather = "sunny"
+            if queryList[i] != nil {
+                weather = queryList[i]!
+            }
+            NetworkManager.shared.callRequest(target: .getWeatherPhoto(query: weather),model: Photo.self) { response in
                 switch response {
                 case .success(let value) :
-                    if let photo = value.results.first, let url = photo.urls.thumb {
-                        result.append( URL(string: url))
+                    var url : URL?
+                    if let photo = value.results.first, let photoUrl = photo.urls.thumb {
+                        url = URL(string: photoUrl)
                     } else {
-                        result.append(nil)
+                        url = nil
                     }
+                    internalData.weatherImageUrlList.value.append(url)
                     group.leave()
                 case .failure(let failure) :
                     if let errorType = failure as? NetworkError {
@@ -147,8 +147,26 @@ struct SearchWeatherViewModel: BaseViewModel {
             }
         }
         group.notify(queue: .main) {
-            self.output.cityWeatherInfo.value = cityInfo
-            output.weatherPhotoList.value = result
+            mappingCityWeather()
+
         }
     }
+    private func mappingCityWeather() {
+        guard let cityInfo = input.totalCityInfo.value else {return}
+        let weatehrList = internalData.weatherInfo.value
+        var mapped = [CityWeather]()
+        if cityInfo.count == internalData.weatherImageUrlList.value.count {
+            for (idx,city) in cityInfo.enumerated() {
+                if let weather = weatehrList.first(where: {$0.id == city.id}) {
+                    let cityweather = CityWeather(cityName: city.city, koCityName: city.koCityName, countryName: city.country, koCountryName: city.koCountryName, cityId: city.id, temp: weather.main.temp, tempMin: weather.main.temp_min, tempMax: weather.main.temp_max, description: weather.weather[0].description, icon: weather.weather[0].icon, windSpeed: weather.wind.speed, sunrise: weather.sys.sunrise, sunset: weather.sys.sunset, dateTime: weather.dt, feels: weather.main.feels_like, humidity: weather.main.humidity, weatherImage: internalData.weatherImageUrlList.value[idx])
+                    
+                    mapped.append(cityweather)
+                }
+            }
+            let result = mapped.sorted{$0.koCountryName < $1.koCountryName}
+            self.internalData.cityWeatherInfo.value = result
+            self.output.filteredCityWeather.value = result
+        }
+    }
+
 }
