@@ -30,13 +30,20 @@ struct WeatherFormat {
         return attributedString
     }
     
-    static func attributToDoubleString(text: String, boldTarget: [Double], grayTarget: [Double]?) -> NSMutableAttributedString {
+    static func attributToDoubleString(text: String, boldTarget: [Double], grayTarget: [Double]?, temp: Bool = false) -> NSMutableAttributedString {
         let attributedString = NSMutableAttributedString(string: text)
         
         for target in boldTarget {
             let argument = String(format:" %.1f", target)
             let range = (text as NSString).range(of: argument)
             let bold = UIFont.boldSystemFont(ofSize: 14)
+            if temp {
+                if target >= 30 {
+                    attributedString.addAttribute(.foregroundColor, value: UIColor.systemOrange, range: range)
+                } else if target < 0{
+                    attributedString.addAttribute(.foregroundColor, value: UIColor.systemBlue, range: range)
+                }
+            }
             attributedString.addAttribute(.font, value: bold, range: range)
         }
         

@@ -21,6 +21,7 @@ class SearchWeatherViewController: UIViewController {
         setDelegate()
         setNavigationBar()
         bindData()
+        refreshControl()
         mainView.searchBar.placeholder = "지금, 날씨가 궁금한 곳은?"
         
     }
@@ -50,7 +51,14 @@ class SearchWeatherViewController: UIViewController {
         mainView.cityTableView.dataSource = self
         mainView.searchBar.delegate = self
     }
-
+    private func refreshControl() {
+        mainView.cityTableView.refreshControl = UIRefreshControl()
+        mainView.cityTableView.refreshControl?.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
+    }
+    @objc func refreshTableView() {
+        searchViewModel.input.searchedTerm.value = mainView.searchBar.text
+        mainView.cityTableView.refreshControl?.endRefreshing()
+    }
 }
 extension SearchWeatherViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -65,7 +73,7 @@ extension SearchWeatherViewController: UITableViewDelegate, UITableViewDataSourc
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCity =  searchViewModel.output.cityWeatherInfo.value[indexPath.row]
-        delegate?.passSelectedCityID(id: selectedCity.cityId)
+        delegate?.passSelectedCityID(cityWeather: selectedCity)
         navigationController?.popViewController(animated: true)
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

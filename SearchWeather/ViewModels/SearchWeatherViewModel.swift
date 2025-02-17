@@ -13,7 +13,6 @@ struct SearchWeatherViewModel: BaseViewModel {
     private var internalData: InternalData
 
     struct Input {
-        var reloadDataTrigger: Observable<Void> = Observable(())
         var selectedCityInfo: Observable<SelectedWeatherInfo?> = Observable(nil)
         var searchedTerm: Observable<String?> = Observable(nil)
         var totalCityInfo : Observable<CityInfo?> = Observable(nil)
@@ -113,7 +112,7 @@ struct SearchWeatherViewModel: BaseViewModel {
         
         for city in cityList {
             if let weather = weatehrList.first(where: {$0.id == city.id}) {
-                let cityweather = CityWeather(cityName: city.city, koCityName: city.koCityName, countryName: city.country, koCountryName: city.koCountryName, cityId: city.id, temp: weather.main.temp, tempMin: weather.main.temp_min, tempMax: weather.main.temp_max, description: weather.weather[0].description, icon: weather.weather[0].icon, windSpeed: weather.wind.speed, sunrise: weather.sys.sunrise, sunset: weather.sys.sunset, dateTime: weather.dt)
+                let cityweather = CityWeather(cityName: city.city, koCityName: city.koCityName, countryName: city.country, koCountryName: city.koCountryName, cityId: city.id, temp: weather.main.temp, tempMin: weather.main.temp_min, tempMax: weather.main.temp_max, description: weather.weather[0].description, icon: weather.weather[0].icon, windSpeed: weather.wind.speed, sunrise: weather.sys.sunrise, sunset: weather.sys.sunset, dateTime: weather.dt, feels: weather.main.feels_like, humidity: weather.main.humidity)
                 
                 mapped.append(cityweather)
             }

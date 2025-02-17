@@ -29,18 +29,15 @@ class MainCityViewController: UIViewController {
         mainViewModel.output.errorMessage.lazyBind {[weak self] message in
             self?.showAlert(title: "Error", text: message, button: nil)
         }
-        mainViewModel.output.selectedWeather.lazyBind { selected in
-            guard let selected else {return}
-            self.updateLabel(selected)
-            self.setWeatherImage(url: selected.weather.first?.icon.getWeatherIconURL(), targetImage: self.mainView.weatherIconImageView)
+        mainViewModel.output.outputWeather.lazyBind {  cityWeather in
+            guard let cityWeather else {return}
+            self.updateLabel(cityWeather)
+            self.setWeatherImage(url: cityWeather.icon.getWeatherIconURL(), targetImage: self.mainView.weatherIconImageView)
+            self.mainView.cityLabel.text = String(format: WeatherFormat.location, cityWeather.koCountryName, cityWeather.koCityName)
         }
         mainViewModel.output.weatherImage.lazyBind { img in
             self.setWeatherImage(url: img, targetImage: self.mainView.weatherImageView)
 
-        }
-        mainViewModel.output.selectedCity.bind { [weak self] city in
-            guard let city else {return}
-            self?.mainView.cityLabel.text = String(format: WeatherFormat.location, city.koCountryName, city.koCityName)
         }
     }
     private func setWeatherImage(url: URL?, targetImage: UIImageView) {
@@ -51,27 +48,29 @@ class MainCityViewController: UIViewController {
         }
         
     }
-    private func updateLabel(_ model : CurrentWeather) {
+    private func updateLabel(_ model : CityWeather) {
         
-        mainView.dateLabel.text = model.dt.dateFormat()
+        mainView.dateLabel.text = model.dateTime.dateFormat()
         
-        var formattedString = String(format: WeatherFormat.description, model.weather.first?.description ?? "")
-        mainView.weatherLabel.attributedText = WeatherFormat.attributedSubstring(text: formattedString, arguments: [model.weather.first?.description ?? ""])
+        // description
+        var formattedString = String(format: WeatherFormat.description, model.description)
+        mainView.weatherLabel.attributedText = WeatherFormat.attributedSubstring(text: formattedString, arguments: [model.description])
 
-        formattedString = String(format: WeatherFormat.temp, model.main.temp, model.main.temp_min, model.main.temp_max)
-        mainView.tempLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.main.temp], grayTarget: [model.main.temp_min, model.main.temp_max])
+        //temp tempmin tempmax
+        formattedString = String(format: WeatherFormat.temp, model.temp, model.tempMin, model.tempMax)
+        mainView.tempLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.temp], grayTarget: [model.tempMin, model.tempMax], temp: true)
 
-        formattedString = String(format: WeatherFormat.feelsList, model.main.feels_like)
-        mainView.feelsLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.main.feels_like], grayTarget: nil)
+        //feelslike
+        formattedString = String(format: WeatherFormat.feelsList, model.feels)
+        mainView.feelsLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.feels], grayTarget: nil, temp: true)
 
-        formattedString = String(format: WeatherFormat.sunriseSunset, mainViewModel.output.selectedCity.value?.koCityName ?? model.name, model.sys.sunrise.formatTime(), model.sys.sunset.formatTime())
-        mainView.sunriseSunsetLabel.attributedText = WeatherFormat.attributedSubstring(text: formattedString, arguments: [model.sys.sunrise.formatTime(), model.sys.sunset.formatTime()])
-        mainView.sunriseSunsetLabel.snp.makeConstraints { make in
-            make.height.equalTo(mainView.sunriseSunsetLabel.intrinsicContentSize.height)
-        }
-        formattedString = String(format: WeatherFormat.humidityWind, model.main.humidity, model.wind.speed)
-        mainView.pressureHumidityLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.main.humidity, model.wind.speed], grayTarget: nil)
-        view.layoutIfNeeded()
+        //sun
+        formattedString = String(format: WeatherFormat.sunriseSunset, model.koCityName, model.sunrise.formatTime(), model.sunset.formatTime())
+        mainView.sunriseSunsetLabel.attributedText = WeatherFormat.attributedSubstring(text: formattedString, arguments: [model.sunrise.formatTime(), model.sunset.formatTime()])
+        
+        // humidity wind
+        formattedString = String(format: WeatherFormat.humidityWind, model.humidity, model.windSpeed)
+        mainView.pressureHumidityLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.humidity, model.windSpeed], grayTarget: nil)
     }
     private func setNavigationBar() {
         let reloadItem = UIBarButtonItem(image: UIImage(systemName: "arrow.trianglehead.clockwise"), style: .plain, target: self, action: #selector(reloadWeather))
@@ -98,13 +97,13 @@ class MainCityViewController: UIViewController {
 
 protocol PassDataDelegate {
     func passCityInfo() -> CityInfo?
-    func passSelectedCityID(id: Int)
+    func passSelectedCityID(cityWeather: CityWeather)
 }
 extension MainCityViewController: PassDataDelegate {
     func passCityInfo() -> CityInfo? {
         return mainViewModel.output.cityInfo
     }
-    func passSelectedCityID(id: Int) {
-        mainViewModel.input.selectedCityID.value = id
+    func passSelectedCityID(cityWeather: CityWeather) {
+        mainViewModel.input.selectedCityWeather.value = cityWeather
     }
 }

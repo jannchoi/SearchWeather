@@ -17,16 +17,19 @@ final class MainCityViewModel: BaseViewModel {
     struct Input {
         var selectedCityID: Observable<Int> = Observable(UserDefaultsManager.cityID)
         var reloadDataTrigger: Observable<Void> = Observable(())
+        var selectedCityWeather: Observable<CityWeather?> = Observable(nil)
     }
     struct Output {
         var errorMessage: Observable<String> = Observable("")
         var weatherImage: Observable<URL?> = Observable(nil)
-        var selectedCity: Observable<City?> = Observable(nil)
-        var selectedWeather: Observable<CurrentWeather?> = Observable(nil)
+        var outputWeather: Observable<CityWeather?> = Observable(nil)
         var cityInfo = CityInfo.decode(fileName: "CityInfo")
+        
     }
     private struct InternalData {
         var weatherQeury: Observable<String> = Observable("")
+        
+        var weatherInfo : Observable<CurrentWeather?> = Observable(nil)
     }
     
     init() {
@@ -38,23 +41,29 @@ final class MainCityViewModel: BaseViewModel {
     func transform() {
         input.selectedCityID.bind { id in
             self.getWeather([id])
-            self.findCityInCityInfo(id: id)
-            UserDefaultsManager.cityID = id
         }
         internalData.weatherQeury.lazyBind { _ in
             self.getWeatherPhoto()
         }
         input.reloadDataTrigger.lazyBind {_ in
-            self.getWeather([self.input.selectedCityID.value])
-            self.findCityInCityInfo(id: self.input.selectedCityID.value)
+            self.getWeather([UserDefaultsManager.cityID])
         }
+        internalData.weatherInfo.lazyBind { _ in
+            self.mappingCityWeather()
+        }
+        input.selectedCityWeather.lazyBind { cityWeather in
+            guard let cityWeather else {return}
+            self.output.outputWeather.value = cityWeather
+            UserDefaultsManager.cityID = cityWeather.cityId
+        }
+        
     }
-    private func findCityInCityInfo(id: Int) {
-        guard let cityinfo = output.cityInfo else {return}
-        for city in cityinfo.cities {
-            if id == city.id {
-                output.selectedCity.value = city
-                return
+    private func mappingCityWeather() {
+        guard let weatherInfo = internalData.weatherInfo.value, let cityList = output.cityInfo?.cities else {return}
+        
+        for city in cityList {
+            if weatherInfo.id == city.id {
+                output.outputWeather.value = CityWeather(cityName: city.city, koCityName: city.koCityName, countryName: city.country, koCountryName: city.koCountryName, cityId: city.id, temp: weatherInfo.main.temp, tempMin: weatherInfo.main.temp_min, tempMax: weatherInfo.main.temp_max, description: weatherInfo.weather[0].description, icon: weatherInfo.weather[0].icon, windSpeed: weatherInfo.wind.speed, sunrise: weatherInfo.sys.sunrise, sunset: weatherInfo.sys.sunset, dateTime: weatherInfo.dt, feels: weatherInfo.main.feels_like, humidity: weatherInfo.main.humidity)
             }
         }
     }
@@ -62,7 +71,7 @@ final class MainCityViewModel: BaseViewModel {
         NetworkManager.shared.callRequest(target: .getWeatherInfo(id: input),model: Weather.self) { response in
             switch response {
             case .success(let value) :
-                self.output.selectedWeather.value = value.list.first
+                self.internalData.weatherInfo.value = value.list.first
                 self.internalData.weatherQeury.value = value.list.description
             case .failure(let failure) :
                 if let errorType = failure as? NetworkError {
@@ -76,8 +85,11 @@ final class MainCityViewModel: BaseViewModel {
         NetworkManager.shared.callRequest(target: .getWeatherPhoto(query: internalData.weatherQeury.value),model: Photo.self) { response in
             switch response {
             case .success(let value) :
-                guard let url = value.results[0].urls.thumb else {return}
-                self.output.weatherImage.value = URL(string: url)
+                if let photo = value.results.first, let url = photo.urls.thumb {
+                    self.output.weatherImage.value = URL(string: url)
+                }else {
+                    self.output.weatherImage.value = nil
+                }
             case .failure(let failure) :
                 if let errorType = failure as? NetworkError {
                     self.output.errorMessage.value = errorType.errorMessage

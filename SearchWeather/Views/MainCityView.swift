@@ -21,6 +21,7 @@ final class MainCityView: BaseView {
     let imageBackView = UIView()
     let todayLabel = UILabel()
     let weatherImageView = UIImageView()
+    let forecastButton = UIButton()
     
     
     
@@ -32,6 +33,7 @@ final class MainCityView: BaseView {
         weatherStackView.addArrangedSubview(weatherLabel)
         imageBackView.addSubview(todayLabel)
         imageBackView.addSubview(weatherImageView)
+        addSubview(forecastButton)
     }
     override func configureLayout() {
         cityLabel.snp.makeConstraints { make in
@@ -63,18 +65,27 @@ final class MainCityView: BaseView {
             make.height.equalTo(45)
         }
         sunriseSunsetLabel.snp.makeConstraints { make in
-            make.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(8)
+            make.leading.equalTo(safeAreaLayoutGuide).inset(8)
+            make.trailing.lessThanOrEqualTo(safeAreaLayoutGuide).inset(8)
             make.top.equalTo(feelsLabel.snp.bottom).offset(8)
+            //make.height.equalTo(60)
         }
         pressureHumidityLabel.snp.makeConstraints { make in
             make.leading.equalTo(safeAreaLayoutGuide).inset(8)
             make.top.equalTo(sunriseSunsetLabel.snp.bottom).offset(8)
             make.height.equalTo(45)
         }
+
+        forecastButton.snp.makeConstraints { make in
+            make.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(8)
+            make.bottom.equalTo(safeAreaLayoutGuide)
+            make.height.equalTo(50)
+            
+        }
         imageBackView.snp.makeConstraints { make in
             make.top.equalTo(pressureHumidityLabel.snp.bottom).offset(8)
             make.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(8)
-            make.bottom.equalTo(safeAreaLayoutGuide).inset(8)
+            make.bottom.equalTo(forecastButton.snp.top)
         }
         todayLabel.snp.makeConstraints { make in
             make.top.equalTo(imageBackView)
@@ -103,6 +114,10 @@ final class MainCityView: BaseView {
         weatherImageView.image = UIImage(systemName: "star")
         weatherImageView.backgroundColor = .white
         imageBackView.backgroundColor = .white
+        forecastButton.backgroundColor = .clear
+        forecastButton.setImage(UIImage(systemName: "chevron.down.2"), for: .normal)
+        forecastButton.tintColor = .black
+        forecastButton.setAttributedTitle(NSAttributedString(string: "5일간 예보 보러가기", attributes: [NSAttributedString.Key.foregroundColor : UIColor.black, .font: UIFont.systemFont(ofSize: 14)]), for: .normal)
         
     }
     func updateLayout() {

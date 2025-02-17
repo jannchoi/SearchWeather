@@ -23,5 +23,7 @@ struct CityWeather {
     let sunrise: Int
     let sunset: Int
     let dateTime: Int
-    
+    let feels: Double
+    let humidity: Double
 }
+
