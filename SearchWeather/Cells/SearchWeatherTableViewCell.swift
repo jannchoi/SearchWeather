@@ -75,16 +75,17 @@ class SearchWeatherTableViewCell: BaseTableViewCell {
     }
     override func layoutSubviews() {
         super.layoutSubviews()
-        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4))
+        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8))
     }
     override func configureView() {
         cityLabel.font = UIFont.boldSystemFont(ofSize: 14)
         countryLabel.font = UIFont.systemFont(ofSize: 12)
         tempMinMaxLabel.font = UIFont.systemFont(ofSize: 12)
         tempLabel.font = UIFont.boldSystemFont(ofSize: 20)
-        contentView.backgroundColor = .purpleCell
+        self.backgroundColor = .purpleCell
         DispatchQueue.main.async {
-            self.contentView.layer.cornerRadius = 8
+            self.contentView.layer.cornerRadius = 10
+            self.contentView.clipsToBounds = true
         }
     }
 

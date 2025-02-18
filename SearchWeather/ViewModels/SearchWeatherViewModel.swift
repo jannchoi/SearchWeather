@@ -38,15 +38,17 @@ struct SearchWeatherViewModel: BaseViewModel {
         transform()
     }
     func transform() {
-        input.reloadData.lazyBind { _ in
+        //초기 진입, 데이터 리로드 :getIdlist ->getquery -> getphot -> getweather -> mapping 순서
+        // 검색어 입력 : geIdlist
+        input.reloadData.lazyBind { _ in // 데이터 새로고침
             getIdList(nil)
         }
-        input.totalCityInfo.lazyBind { cityinfo in
+        input.totalCityInfo.lazyBind { cityinfo in // 초기진입시 mainviewmodel에서 얻은 cityinfo를 받아와서 데이터 로드
             guard cityinfo != nil else {return}
             getIdList(nil)
         }
         
-        input.searchedTerm.lazyBind { text in
+        input.searchedTerm.lazyBind { text in // 검색어 입력 시
             guard let text else {return}
             var inputText = text.trimmingCharacters(in: .whitespacesAndNewlines)
             inputText = inputText.lowercased()
@@ -67,18 +69,18 @@ struct SearchWeatherViewModel: BaseViewModel {
                         tempCityWeather.append(internalData.cityWeatherInfo.value[idx])
                     }
                 }
-                if tempCityWeather.isEmpty {
+                if tempCityWeather.isEmpty { // 내부 전테 데이터 할당
                     output.showEmptyLabel.value = true
                     output.filteredCityWeather.value = internalData.cityWeatherInfo.value
                     return
-                }
+                } // 필터링된 데이터 할당
                 output.filteredCityWeather.value = tempCityWeather
 
-            } else { // 공백 검색
+            } else { // 공백 검색 : 내부 전체 데이터 할당
                 output.filteredCityWeather.value = internalData.cityWeatherInfo.value
             }
             
-        } else { // initial / refresh
+        } else { // initial / refresh : 데이터 리로드
             internalData.weatherImageUrlList.value.removeAll()
             getQueryID()
         }
@@ -88,9 +90,11 @@ struct SearchWeatherViewModel: BaseViewModel {
     private func getQueryID() {
         guard let cityInfo = input.totalCityInfo.value else {return}
         let infoList = cityInfo.map{$0.id}
+        
         let cityCount = infoList.count
         let loopCount = (cityCount / 20)
-        let group = DispatchGroup()
+        let group = DispatchGroup() // 루프를 다 돌고 최종적인 날씨 데이터를 확보 후 getWeatherPhoto
+        
         for i in 0...loopCount {
             let lastIdx = min((i + 1) * 20, cityCount)
             let tempList = Array(infoList[i*20..<lastIdx])
@@ -119,7 +123,7 @@ struct SearchWeatherViewModel: BaseViewModel {
     }
     
     private func getWeatherPhoto() {
-        let group = DispatchGroup()
+        let group = DispatchGroup() // 날씨데이터를 모두 확보 후 mapping
         let queryList = internalData.weatherInfo.value.map{$0.weather.first?.main}
         for i in queryList.indices {
             group.enter()

@@ -34,7 +34,7 @@ class SearchWeatherViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     private func bindData() {
-        searchViewModel.input.totalCityInfo.value = delegate?.passCityInfo()
+        searchViewModel.input.totalCityInfo.value = delegate?.passCityInfo() // mainViewModel로부터 cityInfo를 얻어옴
         
         searchViewModel.output.filteredCityWeather.lazyBind { list in
             self.mainView.cityTableView.reloadData()
@@ -78,7 +78,7 @@ extension SearchWeatherViewController: UITableViewDelegate, UITableViewDataSourc
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCity =  searchViewModel.output.filteredCityWeather.value[indexPath.row]
-        delegate?.passSelectedCityID(cityWeather: selectedCity)
+        delegate?.passSelectedCityID(cityWeather: selectedCity) // 선택된 날씨에 대한 정보를 보냄
         navigationController?.popViewController(animated: true)
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

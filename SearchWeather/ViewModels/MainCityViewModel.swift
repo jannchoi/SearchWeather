@@ -23,7 +23,6 @@ final class MainCityViewModel: BaseViewModel {
     }
     struct Output {
         var errorMessage: Observable<String> = Observable("")
-        
         var outputWeather: Observable<CityWeather?> = Observable(nil)
         var cityInfo = CityInfo.decode(fileName: "CityInfo")
         var weatherForecast = Observable([CityWeather]())
@@ -41,61 +40,56 @@ final class MainCityViewModel: BaseViewModel {
         internalData = InternalData()
         transform()
     }
-    func transform() {
-        input.selectedCityID.bind { id in
-            self.getWeather([id])
+    func transform() { // getweather -> getphoto -> mapping 순서로 진행
+        
+        input.selectedCityID.bind { [weak self] id in //초기 진입시
+            self?.getWeather([id])
         }
-        input.reloadDataTrigger.lazyBind {_ in
-            self.getWeather([UserDefaultsManager.cityID])
+        input.reloadDataTrigger.lazyBind { _ in // 새로고침
+            self.getWeather([self.input.selectedCityID.value])
         }
-        input.selectedCityWeather.lazyBind { cityWeather in
+        input.selectedCityWeather.lazyBind { [weak self] cityWeather in //searchview에서 선택된 도시를 받아왔을 때
             guard let cityWeather else {return}
-            self.output.outputWeather.value = cityWeather
+            self?.output.outputWeather.value = cityWeather
+            self?.input.selectedCityID.value = UserDefaultsManager.cityID
             UserDefaultsManager.cityID = cityWeather.cityId
         }
-        input.getForecast.lazyBind { _ in
-            self.getForecast(UserDefaultsManager.cityID)
-        }
+        
+//        input.getForecast.lazyBind { _ in
+//            self.getForecast(UserDefaultsManager.cityID)
+//        }
         
         
     }
-    private func getForecast(_ input: Int) {
-        let group = DispatchGroup()
-        group.enter()
-        NetworkManager.shared.callRequest(target: .getForecast(id: input),model: Weather.self) { response in
-            switch response {
-            case .success(let value) :
-                self.internalData.weatherInfo = value.list.first
-                self.internalData.weatherQeury = value.list.description
-                group.leave()
-            case .failure(let failure) :
-                if let errorType = failure as? NetworkError {
-                    self.output.errorMessage.value = errorType.errorMessage
-                }
-                group.leave()
-            }
-        }
-        group.notify(queue: .main) {
-            self.getWeatherPhoto()
-        }
-    }
-    private func mappingCityWeather() {
-        guard let weatherInfo = internalData.weatherInfo, let cityList = output.cityInfo?.cities else {return}
-        
-        for city in cityList {
-            if weatherInfo.id == city.id {
-                output.outputWeather.value = CityWeather(cityName: city.city, koCityName: city.koCityName, countryName: city.country, koCountryName: city.koCountryName, cityId: city.id, temp: weatherInfo.main.temp, tempMin: weatherInfo.main.temp_min, tempMax: weatherInfo.main.temp_max, description: weatherInfo.weather[0].description, icon: weatherInfo.weather[0].icon, windSpeed: weatherInfo.wind.speed, sunrise: weatherInfo.sys.sunrise, sunset: weatherInfo.sys.sunset, dateTime: weatherInfo.dt, feels: weatherInfo.main.feels_like, humidity: weatherInfo.main.humidity, weatherImage: internalData.weatherImage)
-                return
-            }
-        }
-    }
-    private func getWeather(_ input: [Int]) {
+//    private func getForecast(_ input: Int) {
+//        let group = DispatchGroup()
+//        group.enter()
+//        NetworkManager.shared.callRequest(target: .getForecast(id: input),model: Weather.self) { response in
+//            switch response {
+//            case .success(let value) :
+//                self.internalData.weatherInfo = value.list.first
+//                self.internalData.weatherQeury = value.list.description
+//                group.leave()
+//            case .failure(let failure) :
+//                if let errorType = failure as? NetworkError {
+//                    self.output.errorMessage.value = errorType.errorMessage
+//                }
+//                group.leave()
+//            }
+//        }
+//        group.notify(queue: .main) {
+//            self.getWeatherPhoto()
+//        }
+//    }
+    
+    
+    private func getWeather(_ input: [Int]) { //날씨 데이터
         let group = DispatchGroup()
         group.enter()
         NetworkManager.shared.callRequest(target: .getWeatherInfo(id: input),model: Weather.self) { response in
             switch response {
             case .success(let value) :
-                self.internalData.weatherInfo = value.list.first
+                self.internalData.weatherInfo = value.list.first //하나의 날씨만 보여줄 거니까 
                 self.internalData.weatherQeury = value.list.first?.weather.first?.main
                 group.leave()
             case .failure(let failure) :
@@ -109,9 +103,10 @@ final class MainCityViewModel: BaseViewModel {
             self.getWeatherPhoto()
         }
     }
-    private func getWeatherPhoto() {
+    private func getWeatherPhoto() { // 날씨에 대한 사진 
         let group = DispatchGroup()
         group.enter()
+        
         var weather = "sunny"
         if internalData.weatherQeury != nil {
             weather = internalData.weatherQeury!
@@ -136,6 +131,16 @@ final class MainCityViewModel: BaseViewModel {
                 self.mappingCityWeather()
             }
 
+        }
+    }
+    private func mappingCityWeather() { // 서버에서 얻은 데이터와 cityinfo데이터를 cityweather로 매핑
+        guard let weatherInfo = internalData.weatherInfo, let cityList = output.cityInfo?.cities else {return}
+        
+        for city in cityList {
+            if weatherInfo.id == city.id {
+                output.outputWeather.value = CityWeather(cityName: city.city, koCityName: city.koCityName, countryName: city.country, koCountryName: city.koCountryName, cityId: city.id, temp: weatherInfo.main.temp, tempMin: weatherInfo.main.temp_min, tempMax: weatherInfo.main.temp_max, description: weatherInfo.weather[0].description, icon: weatherInfo.weather[0].icon, windSpeed: weatherInfo.wind.speed, sunrise: weatherInfo.sys.sunrise, sunset: weatherInfo.sys.sunset, dateTime: weatherInfo.dt, feels: weatherInfo.main.feels_like, humidity: weatherInfo.main.humidity, weatherImage: internalData.weatherImage)
+                return
+            }
         }
     }
 }

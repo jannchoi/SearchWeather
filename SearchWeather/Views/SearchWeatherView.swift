@@ -27,12 +27,13 @@ final class SearchWeatherView : BaseView {
             make.center.equalTo(safeAreaLayoutGuide)
         }
         cityTableView.snp.makeConstraints { make in
-            make.top.equalTo(searchBar.snp.bottom).offset(8)
-            make.horizontalEdges.bottom.equalTo(safeAreaLayoutGuide)
+            make.top.equalTo(searchBar.snp.bottom)
+            make.horizontalEdges.bottom.equalTo(safeAreaInsets)
         }
     }
     override func configureView() {
-        backgroundColor = .purpleBack
+        backgroundColor = .white
+        cityTableView.backgroundColor = .purpleBack
         emptyResultLabel.labelDesign(inputText: "원하는 도시를 찾지 못했습니다.", size: 14)
         cityTableView.register(SearchWeatherTableViewCell.self, forCellReuseIdentifier: SearchWeatherTableViewCell.id)
     }
