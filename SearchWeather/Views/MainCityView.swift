@@ -23,6 +23,20 @@ final class MainCityView: BaseView {
     let weatherImageView = UIImageView()
     let forecastButton = UIButton()
     
+    let searchButton = {
+        let view = UIButton()
+        view.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
+        view.tintColor = .black
+        return view
+    }()
+    
+    let reloadButton = {
+        let view = UIButton()
+        view.setImage(UIImage(systemName: "arrow.trianglehead.clockwise"), for: .normal)
+        view.tintColor = .black
+        return view
+    }()
+    
     
     
     override func configureHierachy() {

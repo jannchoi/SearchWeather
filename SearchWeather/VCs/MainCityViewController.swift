@@ -8,10 +8,13 @@
 import UIKit
 import Kingfisher
 import SnapKit
+import RxSwift
+import RxCocoa
 
 class MainCityViewController: UIViewController {
     let mainView = MainCityView()
     let mainViewModel = MainCityViewModel()
+    let disposeBag = DisposeBag()
     
     override func loadView() {
         view = mainView
@@ -27,17 +30,24 @@ class MainCityViewController: UIViewController {
 
     
     private func bindData() {
+        let input = MainCityViewModel.Input(reloadDataTrigger: mainView.reloadButton.rx.tap, searchButtonTrigger: mainView.searchButton.rx.tap)
+        let output = mainViewModel.transform(input: input)
         
-        mainViewModel.output.errorMessage.lazyBind {[weak self] message in
-            self?.showAlert(title: "Error", text: message, button: nil)
-        }
-        mainViewModel.output.outputWeather.lazyBind {  cityWeather in
-            guard let cityWeather else {return}
-            self.updateLabel(cityWeather)
-            self.setWeatherImage(url: cityWeather.icon.getWeatherIconURL(), targetImage: self.mainView.weatherIconImageView)
-            self.setWeatherImage(url: cityWeather.weatherImage, targetImage: self.mainView.weatherImageView)
-            
-        }
+        output.cityWeather.bind(with: self) { owner, cityweather in
+            owner.updateLabel(cityweather)
+            owner.setWeatherImage(url: cityweather.icon.getWeatherIconURL(), targetImage: owner.mainView.weatherIconImageView)
+            owner.setWeatherImage(url: cityweather.weatherImage, targetImage: owner.mainView.weatherImageView)
+        }.disposed(by: disposeBag)
+        
+        output.errorMessage.drive(with: self) { owner, message in
+            owner.showAlert(title: "Error", text: message, button: nil)
+        }.disposed(by: disposeBag)
+        
+        output.searchButtonTrigger.drive(with: self) { owner, _ in
+            let vc = SearchWeatherViewController()
+            owner.navigationController?.pushViewController(vc, animated: true)
+        }.disposed(by: disposeBag)
+
     }
     private func setWeatherImage(url: URL?, targetImage: UIImageView) {
         if let url {
@@ -74,20 +84,9 @@ class MainCityViewController: UIViewController {
         mainView.pressureHumidityLabel.attributedText = WeatherFormat.attributToDoubleString(text: formattedString, boldTarget: [model.humidity, model.windSpeed], grayTarget: nil)
     }
     private func setNavigationBar() {
-        let reloadItem = UIBarButtonItem(image: UIImage(systemName: "arrow.trianglehead.clockwise"), style: .plain, target: self, action: #selector(reloadWeather))
-        reloadItem.tintColor = .black
-        let searchItem = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: .plain, target: self, action: #selector(searchButtonTapped))
-        searchItem.tintColor = .black
+        let reloadItem = UIBarButtonItem(customView: mainView.reloadButton)
+        let searchItem = UIBarButtonItem(customView: mainView.searchButton)
         navigationItem.rightBarButtonItems = [searchItem, reloadItem]
-        
-    }
-    @objc private func reloadWeather() {
-        mainViewModel.input.reloadDataTrigger.value = ()
-    }
-    @objc private func searchButtonTapped() {
-        let vc = SearchWeatherViewController()
-        vc.delegate = self
-        navigationController?.pushViewController(vc, animated: true)
         
     }
     override func viewDidLayoutSubviews() {
@@ -101,9 +100,7 @@ protocol PassDataDelegate {
     func passSelectedCityID(cityWeather: CityWeather)
 }
 extension MainCityViewController: PassDataDelegate {
-    func passCityInfo() -> [City]? {
-        return mainViewModel.output.cityInfo?.cities.sorted{$0.koCountryName < $1.koCountryName}
-    }
+
     func passSelectedCityID(cityWeather: CityWeather) {
         mainViewModel.input.selectedCityWeather.value = cityWeather
     }

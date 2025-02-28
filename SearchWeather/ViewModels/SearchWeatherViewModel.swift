@@ -6,37 +6,58 @@
 //
 
 import Foundation
+import RxSwift
+import RxCocoa
 
-struct SearchWeatherViewModel: BaseViewModel {
-    private(set) var input: Input
-    private(set) var output: Output
+struct SearchWeatherViewModel {
     private var internalData: InternalData
+    let disposeBag = DisposeBag()
+    let cityInfo = CityInfo.decode(fileName: "CityInfo")
+    let errorMessageTrigger = PublishSubject<String>()
 
     struct Input {
-        var selectedCityInfo: Observable<SelectedWeatherInfo?> = Observable(nil)
-        var searchedTerm: Observable<String?> = Observable(nil)
-        var totalCityInfo : Observable<[City]?> = Observable(nil)
-        var reloadData: Observable<Void> = Observable(())
-        
+        let reloadDataTrigger : ControlEvent<Void>
+        let selectedCityInfo
+        let searchedTerm
+
     }
     struct Output {
-        var errorMessage: Observable<String> = Observable("")
-        var showEmptyLabel = Observable(false)
-        var filteredCityWeather = Observable([CityWeather]())
+        let cityWeather : PublishSubject<CityWeather>
+        let errorMessage : Driver<String>
+        let reloadDataTrigger : Driver<Void>
+
     }
     private struct InternalData {
-        var weatherInfo = Observable([CurrentWeather]())
-        var cityWeatherInfo = Observable([CityWeather]())
-        var weatherImageUrlList = Observable([URL?]())
-        
+        var weatherQeury : String? = ""
+        var weatherImage : URL? = nil
+        var weatherInfo : CurrentWeather? = nil
+        var cityWeather = PublishSubject<CityWeather>()
     }
     
     init() {
-        input = Input()
-        output = Output()
         internalData = InternalData()
-        transform()
     }
+
+//        
+//    }
+//    struct Output {
+//        var errorMessage: Observable<String> = Observable("")
+//        var showEmptyLabel = Observable(false)
+//        var filteredCityWeather = Observable([CityWeather]())
+//    }
+//    private struct InternalData {
+//        var weatherInfo = Observable([CurrentWeather]())
+//        var cityWeatherInfo = Observable([CityWeather]())
+//        var weatherImageUrlList = Observable([URL?]())
+//        
+//    }
+//    
+//    init() {
+//        input = Input()
+//        output = Output()
+//        internalData = InternalData()
+//        transform()
+//    }
     func transform() {
         //초기 진입, 데이터 리로드 :getIdlist ->getquery -> getphot -> getweather -> mapping 순서
         // 검색어 입력 : geIdlist

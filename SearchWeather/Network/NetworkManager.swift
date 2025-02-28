@@ -7,6 +7,8 @@
 
 import Foundation
 import Alamofire
+import RxSwift
+import RxCocoa
 
 enum NetworkRouter: URLRequestConvertible {
     case getWeatherInfo(id: [Int])
@@ -81,21 +83,42 @@ class NetworkManager {
     
     private init() { }
     
-    func callRequest<T:Decodable>(target: NetworkRouter,model: T.Type,completionHandler: @escaping (Result<T,Error>) -> Void) {
-        AF.request(target)
-            .validate(statusCode: 200..<300)
-            .responseDecodable(of: T.self) { response in
-                switch response.result {
-                case .success(let value):
-                    completionHandler(.success(value))
-                case .failure(let error) :
-                    let code = response.response?.statusCode
-                    completionHandler(.failure(self.getErrorMessage(code: code ?? 500)))
-                    print(T.self, error)
-                }
+//    func callRequest<T:Decodable>(target: NetworkRouter,model: T.Type,completionHandler: @escaping (Result<T,Error>) -> Void) {
+//        AF.request(target)
+//            .validate(statusCode: 200..<300)
+//            .responseDecodable(of: T.self) { response in
+//                switch response.result {
+//                case .success(let value):
+//                    completionHandler(.success(value))
+//                case .failure(let error) :
+//                    let code = response.response?.statusCode
+//                    completionHandler(.failure(self.getErrorMessage(code: code ?? 500)))
+//                    print(T.self, error)
+//                }
+//        }
+//    }
+    
+    func callRequest<T:Decodable>(target: NetworkRouter,model: T.Type) -> Observable<T> {
+        return Observable<T>.create { value in
+            AF.request(target)
+                .validate(statusCode: 200..<300)
+                .responseDecodable(of: T.self) { response in
+                    switch response.result {
+                    case .success(let result):
+                        value.onNext(result)
+                    case .failure(let error) :
+                        let code = response.response?.statusCode
+                        value.onError(self.getErrorMessage(code: code ?? 500))
+                        print(T.self, error)
+                    }
+            }
+            return Disposables.create {
+                print("끝")
+            }
         }
+
     }
-    // 0 8 16 24 32 40
+    
     private func getErrorMessage(code: Int) -> NetworkError {
         switch code {
         case 400 : return .badRequest
