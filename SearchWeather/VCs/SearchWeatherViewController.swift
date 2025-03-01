@@ -6,91 +6,75 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
+import Kingfisher
 
 class SearchWeatherViewController: UIViewController {
 
     let mainView = SearchWeatherView()
-    let searchViewModel = SearchWeatherViewModel()
+    var searchViewModel = SearchWeatherViewModel()
+    let refreshControl = UIRefreshControl()
     var delegate: PassDataDelegate?
+    
+    let disposeBag = DisposeBag()
     
     override func loadView() {
         view = mainView
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        setDelegate()
+        mainView.cityTableView.refreshControl = refreshControl
         setNavigationBar()
         bindData()
-        refreshControl()
-        mainView.searchBar.placeholder = "지금, 날씨가 궁금한 곳은?"
+    }
+
+    private func bindData() {
+
+        let recentText = BehaviorSubject<String?>(value: nil)
+        let input = SearchWeatherViewModel.Input(reloadDataTrigger: refreshControl.rx.controlEvent(.valueChanged),selectedCity: mainView.cityTableView.rx.modelSelected(CityWeather.self), searchedTerm: recentText, didscroll: mainView.cityTableView.rx.didScroll)
+        let output = searchViewModel.transform(input: input)
+
+        
+        output.cityWeather.bind(to: mainView.cityTableView.rx.items(cellIdentifier: SearchWeatherTableViewCell.id, cellType: SearchWeatherTableViewCell.self)) {
+            (row, element, cell) in
+            cell.configureData(cityWeather: element)
+        }.disposed(by: disposeBag)
+        
+        mainView.searchBar.rx.text.bind(to: recentText).disposed(by: disposeBag)
+        
+        output.showEmptyLabel.drive(with: self) { owner, showempty in
+            if showempty {
+                owner.mainView.cityTableView.isHidden = true
+            }else  {
+                owner.mainView.cityTableView.isHidden = false
+            }
+        }.disposed(by: disposeBag)
+        
+        output.errorMessage.drive(with: self) { owner, message in
+            owner.showAlert(title: "Error", text: message, button: nil)
+        }.disposed(by: disposeBag)
+        
+        output.didScroll.drive(with: self) { owner, _ in
+            owner.mainView.searchBar.resignFirstResponder()
+        }.disposed(by: disposeBag)
+        
+        output.selectedCity.bind(with: self) { owner, item in
+            owner.delegate?.passSelectedCityID(cityWeather: item) // 선택된 날씨에 대한 정보를 보냄
+            owner.navigationController?.popViewController(animated: true)
+        }.disposed(by: disposeBag)
+        
+        mainView.backButton.rx.tap.bind(with: self) { owner, _ in
+            owner.navigationController?.popViewController(animated: true)
+        }.disposed(by: disposeBag)
+
         
     }
     private func setNavigationBar() {
         navigationItem.title = "도시 검색"
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: .plain, target: self, action: #selector(backButtonTapped))
-        navigationItem.leftBarButtonItem?.tintColor = .black
-    }
-    @objc private func backButtonTapped() {
-        navigationController?.popViewController(animated: true)
-    }
-    private func bindData() {
-        searchViewModel.input.totalCityInfo.value = delegate?.passCityInfo() // mainViewModel로부터 cityInfo를 얻어옴
-        
-        searchViewModel.output.filteredCityWeather.lazyBind { list in
-            self.mainView.cityTableView.reloadData()
-
-        }
-        searchViewModel.output.errorMessage.lazyBind {[weak self] message in
-            self?.showAlert(title: "Error", text: message, button: nil)
-        }
-        searchViewModel.output.showEmptyLabel.lazyBind { showempty in
-            if showempty {
-                self.mainView.cityTableView.isHidden = true
-            }else  {
-                self.mainView.cityTableView.isHidden = false
-            }
-        }
-    }
-    private func setDelegate() {
-        mainView.cityTableView.delegate = self
-        mainView.cityTableView.dataSource = self
-        mainView.searchBar.delegate = self
-    }
-    private func refreshControl() {
-        mainView.cityTableView.refreshControl = UIRefreshControl()
-        mainView.cityTableView.refreshControl?.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
-    }
-    @objc func refreshTableView() {
-        searchViewModel.input.reloadData.value = ()
-        mainView.cityTableView.refreshControl?.endRefreshing()
-    }
-}
-extension SearchWeatherViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-
-        return searchViewModel.output.filteredCityWeather.value.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchWeatherTableViewCell.id) as? SearchWeatherTableViewCell else {return UITableViewCell()}
-        cell.configureData(cityWeather: searchViewModel.output.filteredCityWeather.value[indexPath.row])
-        return cell
-    }
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedCity =  searchViewModel.output.filteredCityWeather.value[indexPath.row]
-        delegate?.passSelectedCityID(cityWeather: selectedCity) // 선택된 날씨에 대한 정보를 보냄
-        navigationController?.popViewController(animated: true)
-    }
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 90
-    }
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        mainView.searchBar.resignFirstResponder()
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: mainView.backButton)
     }
 
 }
-extension SearchWeatherViewController: UISearchBarDelegate {
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        searchViewModel.input.searchedTerm.value = searchText
-    }
-}
+
+

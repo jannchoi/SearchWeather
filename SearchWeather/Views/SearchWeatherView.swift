@@ -11,6 +11,7 @@ final class SearchWeatherView : BaseView {
     let searchBar = UISearchBar()
     let cityTableView = UITableView()
     let emptyResultLabel = UILabel()
+    let backButton = UIButton()
     
     override func configureHierachy() {
         addSubview(searchBar)
@@ -36,6 +37,9 @@ final class SearchWeatherView : BaseView {
         cityTableView.backgroundColor = .purpleBack
         emptyResultLabel.labelDesign(inputText: "원하는 도시를 찾지 못했습니다.", size: 14)
         cityTableView.register(SearchWeatherTableViewCell.self, forCellReuseIdentifier: SearchWeatherTableViewCell.id)
+        searchBar.placeholder = "지금, 날씨가 궁금한 곳은?"
+        backButton.setImage(UIImage(systemName: "chevron.left"), for: .normal)
+        backButton.tintColor = .black
     }
 }
 
