@@ -99,9 +99,3 @@ protocol PassDataDelegate {
     func passCityInfo() -> [City]?
     func passSelectedCityID(cityWeather: CityWeather)
 }
-extension MainCityViewController: PassDataDelegate {
-
-    func passSelectedCityID(cityWeather: CityWeather) {
-        mainViewModel.input.selectedCityWeather.value = cityWeather
-    }
-}

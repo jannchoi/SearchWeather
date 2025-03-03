@@ -41,8 +41,6 @@ enum UserDefaultsManager {
         case cityID
         case city
     }
-    @MyDefaults(key: Key.cityID.rawValue, empty: 1835848)// default: Seoul
-    static var cityID
     @MyJSONDefaults(key: Key.city.rawValue, empty: SelectedCity(id: 1835848, koCity: "서울", koCountry: "대한민국"))
     static var city
 }

@@ -40,6 +40,8 @@ final class SearchWeatherView : BaseView {
         searchBar.placeholder = "지금, 날씨가 궁금한 곳은?"
         backButton.setImage(UIImage(systemName: "chevron.left"), for: .normal)
         backButton.tintColor = .black
+        cityTableView.rowHeight = 150
+        
     }
 }
 

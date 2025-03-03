@@ -53,7 +53,9 @@ final class SearchWeatherViewModel {
             } else {
                 owner.getIdList(text)
             }
-
+        }.disposed(by: disposeBag)
+        input.selectedCity.asDriver().drive(with: self) { owner, item in
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "city"), object: SelectedCity(id: item.cityId, koCity: item.koCityName, koCountry: item.koCountryName))
         }.disposed(by: disposeBag)
 
         let cityWeather = PublishSubject<[CityWeather]>()

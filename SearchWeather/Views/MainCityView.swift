@@ -82,7 +82,6 @@ final class MainCityView: BaseView {
             make.leading.equalTo(safeAreaLayoutGuide).inset(8)
             make.trailing.lessThanOrEqualTo(safeAreaLayoutGuide).inset(8)
             make.top.equalTo(feelsLabel.snp.bottom).offset(8)
-            //make.height.equalTo(60)
         }
         pressureHumidityLabel.snp.makeConstraints { make in
             make.leading.equalTo(safeAreaLayoutGuide).inset(8)

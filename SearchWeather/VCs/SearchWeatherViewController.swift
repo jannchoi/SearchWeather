@@ -15,7 +15,6 @@ class SearchWeatherViewController: UIViewController {
     let mainView = SearchWeatherView()
     var searchViewModel = SearchWeatherViewModel()
     let refreshControl = UIRefreshControl()
-    var delegate: PassDataDelegate?
     
     let disposeBag = DisposeBag()
     
@@ -36,9 +35,11 @@ class SearchWeatherViewController: UIViewController {
         let output = searchViewModel.transform(input: input)
 
         
-        output.cityWeather.bind(to: mainView.cityTableView.rx.items(cellIdentifier: SearchWeatherTableViewCell.id, cellType: SearchWeatherTableViewCell.self)) {
+        output.cityWeather.bind(to: mainView.cityTableView.rx.items(cellIdentifier: SearchWeatherTableViewCell.id, cellType: SearchWeatherTableViewCell.self)) { [weak self]
             (row, element, cell) in
+            
             cell.configureData(cityWeather: element)
+            self?.refreshControl.endRefreshing()
         }.disposed(by: disposeBag)
         
         mainView.searchBar.rx.text.bind(to: recentText).disposed(by: disposeBag)
@@ -60,7 +61,6 @@ class SearchWeatherViewController: UIViewController {
         }.disposed(by: disposeBag)
         
         output.selectedCity.bind(with: self) { owner, item in
-            owner.delegate?.passSelectedCityID(cityWeather: item) // 선택된 날씨에 대한 정보를 보냄
             owner.navigationController?.popViewController(animated: true)
         }.disposed(by: disposeBag)
         

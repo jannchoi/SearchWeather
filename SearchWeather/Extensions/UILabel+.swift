@@ -15,12 +15,5 @@ extension UILabel {
         textAlignment = alignment
         numberOfLines = lines
     }
-//    func ColoringSubString(subString: String) {
-//        let fullText = text ?? ""
-//        let attributedString = NSMutableAttributedString(string: fullText)
-//        let range = (fullText as NSString).range(of: subString)
-//        attributedString.addAttribute(.foregroundColor, value: UIColor.MyBlue, range: range)
-//        attributedText = attributedString
-//    }
 }
 
